@@ -13,9 +13,11 @@ All notable requests and project changes.
 - Scaffold `mh-dev-kit` plugin (activation hooks, admin notice)
 - Add `scripts/setup-wordpress.sh` for reproducible bootstrap
 
-### WordPress bootstrap completed
+### Foundation PoC — Composer + MVP refactor (v0.2.0)
 
-- Ran `./scripts/setup-wordpress.sh` via `sg docker` (group membership active, shell not refreshed)
-- Site live at https://cursor-wpdev2.ddev.site (HTTP 200)
-- `mh-dev-kit` plugin active
-- Setup script updated to auto-reexec via `sg docker` when needed
+- PSR-4 autoload via Composer (`src/` namespace `MH\DevKit\`)
+- **Foundation** feature: Settings API, 2 CPTs (`mhdk_hosp_menu`, `mhdk_web_link`), 3 dynamic Gutenberg blocks
+- MVP folders per feature: Models, Presenters, Views, Assets
+- Admin menus: **MH Dev Kit** + **MH Dev Kit Content**
+- No npm/webpack; block editor JS uses bundled `wp.*` globals
+- `./scripts/composer-mh-dev-kit.sh` helper added

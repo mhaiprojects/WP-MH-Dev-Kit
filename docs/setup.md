@@ -68,7 +68,8 @@ Only custom code and docs are committed. WordPress core, uploads, and third-part
 
 - **Slug:** `mh-dev-kit`
 - **Path:** `wp-content/plugins/mh-dev-kit/`
-- **Main file:** `mh-dev-kit.php`
+- **Composer:** `./scripts/composer-mh-dev-kit.sh install` (after clone or pull)
+- **Architecture:** [wordpress/mh-dev-kit-architecture.md](wordpress/mh-dev-kit-architecture.md)
 
 ## Reference docs (local copies)
 

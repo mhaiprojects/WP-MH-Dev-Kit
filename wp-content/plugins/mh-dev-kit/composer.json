@@ -1,0 +1,17 @@
+{
+	"name": "mh/dev-kit",
+	"description": "MH Dev Kit — monolithic WordPress development plugin",
+	"type": "wordpress-plugin",
+	"license": "GPL-2.0-or-later",
+	"require": {
+		"php": ">=8.1"
+	},
+	"autoload": {
+		"psr-4": {
+			"MH\\DevKit\\": "src/"
+		}
+	},
+	"config": {
+		"sort-packages": true
+	}
+}

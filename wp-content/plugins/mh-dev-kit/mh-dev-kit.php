@@ -1,8 +1,8 @@
 <?php
 /**
  * Plugin Name:       MH Dev Kit
- * Description:       Development utilities and scaffolding for MH WordPress projects.
- * Version:           0.1.0
+ * Description:       Monolithic WordPress development plugin with modular features.
+ * Version:           0.2.0
  * Requires at least: 6.4
  * Requires PHP:      8.1
  * Author:            MH
@@ -17,20 +17,40 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-define( 'MH_DEV_KIT_VERSION', '0.1.0' );
+define( 'MH_DEV_KIT_VERSION', '0.2.0' );
 define( 'MH_DEV_KIT_FILE', __FILE__ );
 define( 'MH_DEV_KIT_PATH', plugin_dir_path( __FILE__ ) );
 define( 'MH_DEV_KIT_URL', plugin_dir_url( __FILE__ ) );
 
-require_once MH_DEV_KIT_PATH . 'includes/class-mh-dev-kit.php';
-
 /**
- * Bootstrap the plugin.
+ * Admin notice when Composer dependencies are missing.
  */
-function mhdk_init(): void {
-	MH_Dev_Kit::instance();
+function mhdk_missing_vendor_notice(): void {
+	if ( ! current_user_can( 'activate_plugins' ) ) {
+		return;
+	}
+
+	printf(
+		'<div class="notice notice-error"><p>%s</p></div>',
+		esc_html__(
+			'MH Dev Kit requires Composer dependencies. Run: ddev exec "cd wp-content/plugins/mh-dev-kit && composer install"',
+			'mh-dev-kit'
+		)
+	);
 }
-add_action( 'plugins_loaded', 'mhdk_init' );
+
+$autoload = MH_DEV_KIT_PATH . 'vendor/autoload.php';
+
+if ( ! is_readable( $autoload ) ) {
+	add_action( 'admin_notices', 'mhdk_missing_vendor_notice' );
+	return;
+}
+
+require_once $autoload;
+
+add_action( 'plugins_loaded', static function (): void {
+	MH\DevKit\Core\Plugin::boot();
+} );
 
 /**
  * Activation hook.

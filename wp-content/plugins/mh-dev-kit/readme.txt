@@ -3,16 +3,29 @@ Contributors: mh
 Requires at least: 6.4
 Tested up to: 6.8
 Requires PHP: 8.1
-Stable tag: 0.1.0
+Stable tag: 0.2.0
 License: GPLv2 or later
 
-Development utilities and scaffolding for MH WordPress projects.
+Monolithic WordPress development plugin with Composer autoloading and MVP feature modules.
 
 == Description ==
 
-Custom plugin for local development on the Cursor WP Dev 2 project. Tracked in git; WordPress core is not.
+MH Dev Kit provides a modular architecture for custom WordPress features:
+
+* Composer PSR-4 autoloading (no extra dependencies)
+* MVP feature folders: Models, Presenters, Views, Assets
+* Foundation PoC: admin settings, custom post types, Gutenberg blocks
+
+== Installation ==
+
+1. Ensure Composer dependencies are installed: `ddev exec "cd wp-content/plugins/mh-dev-kit && composer install"`
+2. Activate the plugin through the 'Plugins' menu in WordPress
 
 == Changelog ==
 
+= 0.2.0 =
+* Composer + MVP architecture
+* Foundation feature: 3 blocks, 2 CPTs, admin settings
+
 = 0.1.0 =
-* Initial scaffold with activation/deactivation hooks and admin notice.
+* Initial scaffold

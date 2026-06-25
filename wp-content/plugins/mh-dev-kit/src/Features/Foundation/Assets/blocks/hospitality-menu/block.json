@@ -1,0 +1,24 @@
+{
+	"$schema": "https://schemas.wp.org/trunk/block.json",
+	"apiVersion": 3,
+	"name": "mh-dev-kit/hospitality-menu",
+	"title": "Hospitality Menu",
+	"category": "mh-dev-kit",
+	"icon": "food",
+	"description": "Display a Hospitality Menu post.",
+	"textdomain": "mh-dev-kit",
+	"attributes": {
+		"menuId": {
+			"type": "number",
+			"default": 0
+		},
+		"showPrices": {
+			"type": "boolean",
+			"default": true
+		}
+	},
+	"supports": {
+		"html": false
+	},
+	"render": "file:./render.php"
+}
