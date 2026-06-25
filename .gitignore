@@ -1,0 +1,27 @@
+# Ignore everything by default
+/*
+
+# Project meta
+!/.gitignore
+!/README.md
+
+# Documentation
+!/docs/
+!/docs/**
+
+# Setup scripts (optional helper, not WP core)
+!/scripts/
+!/scripts/**
+
+# DDev config (minimal — no generated local state)
+!/.ddev/
+/.ddev/*
+!/.ddev/config.yaml
+
+# Custom code only
+!/wp-content/
+/wp-content/*
+!/wp-content/plugins/
+/wp-content/plugins/*
+!/wp-content/plugins/mh-dev-kit/
+!/wp-content/plugins/mh-dev-kit/**
