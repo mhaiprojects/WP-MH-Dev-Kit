@@ -9,6 +9,9 @@ declare(strict_types=1);
 
 namespace MH\DevKit\Core;
 
+use MH\DevKit\Core\Admin\AdminMenuRegistrar;
+use MH\DevKit\Core\Admin\FeatureAdminContributorInterface;
+
 final class FeatureLoader {
 
 	/**
@@ -29,7 +32,12 @@ final class FeatureLoader {
 				continue;
 			}
 
-			( new $class() )->register();
+			$feature = new $class();
+			$feature->register();
+
+			if ( $feature instanceof FeatureAdminContributorInterface ) {
+				AdminMenuRegistrar::register_contributor( $feature );
+			}
 		}
 	}
 }

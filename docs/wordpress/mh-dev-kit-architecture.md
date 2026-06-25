@@ -10,10 +10,10 @@ wp-content/plugins/mh-dev-kit/
   config/features.php    # Registered feature classes
   mh-dev-kit.php         # Bootstrap + activation hooks
   src/
-    Core/                # Plugin, FeatureLoader, ViewRenderer
+    Core/                # Plugin, FeatureLoader, ViewRenderer, Admin
     Shared/              # AssetRegistrar
     Features/
-      Foundation/        # PoC feature
+      MhdkPoc/           # MHDK-POC feature
       _Template/         # Copy scaffold for new features
   vendor/                # Not in git — run composer install
 ```
@@ -28,12 +28,22 @@ wp-content/plugins/mh-dev-kit/
 | **Assets/** | CSS, JS, Gutenberg `block.json` folders |
 | **`*Feature.php`** | Implements `FeatureInterface`; wires presenters |
 
-## Foundation PoC
+## Core admin
 
-### Admin menus
+| Menu | Slug | Purpose |
+|------|------|---------|
+| **MHDK Settings** | `mhdk-settings` | Plugin settings dashboard |
+| **MHDK Content** | `mhdk-content` | Hub for feature CPTs |
 
-- **MH Dev Kit** → dashboard + **Foundation** settings (`Settings API`)
-- **MH Dev Kit Content** → container for custom post types
+Features register settings subpages via `FeatureAdminContributorInterface::register_admin()`.
+CPTs attach with `'show_in_menu' => AdminMenu::CONTENT_SLUG`.
+
+## MHDK-POC
+
+### Admin
+
+- **MHDK Settings** → **MHDK-POC** settings (`Settings API`)
+- **MHDK Content** → Hospitality Menus, Web Links
 
 ### Custom post types
 
@@ -44,13 +54,13 @@ wp-content/plugins/mh-dev-kit/
 
 ### Gutenberg blocks (no build tools)
 
-Dynamic blocks via `block.json` + `render.php`:
+Dynamic blocks via `block.json` + `render.php` (category **MHDK**):
 
 - `mh-dev-kit/hospitality-menu`
 - `mh-dev-kit/web-links`
 - `mh-dev-kit/callout`
 
-Editor controls: vanilla `block-inspector.js` using bundled `wp.*` packages.
+Editor: `blocks-editor.js` (ServerSideRender preview) + `block-inspector.js` (sidebar controls).
 
 ### Composer
 
@@ -64,5 +74,6 @@ Editor controls: vanilla `block-inspector.js` using bundled `wp.*` packages.
 1. Copy `src/Features/_Template/` → `src/Features/YourFeature/`
 2. Implement Model / Presenter / Views / Assets
 3. Add class to `config/features.php`
-4. Run `composer dump-autoload -o`
-5. Document in feature `README.md` and `docs/changelog.md`
+4. Optionally implement `FeatureAdminContributorInterface` for MHDK Settings subpages
+5. Run `composer dump-autoload -o`
+6. Document in feature `README.md` and `docs/changelog.md`

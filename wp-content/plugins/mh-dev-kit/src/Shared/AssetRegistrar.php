@@ -71,4 +71,36 @@ final class AssetRegistrar {
 			$in_footer
 		);
 	}
+
+	/**
+	 * Register a script from a feature Assets folder (for init-time registration).
+	 *
+	 * @param string $handle   Script handle.
+	 * @param string $feature  Feature folder name.
+	 * @param string $relative Path under Assets/.
+	 * @param array  $deps     Script dependencies.
+	 * @param bool   $in_footer Load in footer.
+	 */
+	public static function register_script(
+		string $handle,
+		string $feature,
+		string $relative,
+		array $deps = array(),
+		bool $in_footer = true
+	): void {
+		$path = MH_DEV_KIT_PATH . 'src/Features/' . $feature . '/Assets/' . ltrim( $relative, '/' );
+		$url  = MH_DEV_KIT_URL . 'src/Features/' . $feature . '/Assets/' . ltrim( $relative, '/' );
+
+		if ( ! is_readable( $path ) ) {
+			return;
+		}
+
+		wp_register_script(
+			$handle,
+			$url,
+			$deps,
+			(string) filemtime( $path ),
+			$in_footer
+		);
+	}
 }

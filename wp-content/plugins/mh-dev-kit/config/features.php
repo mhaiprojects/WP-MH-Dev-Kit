@@ -8,5 +8,5 @@
 declare(strict_types=1);
 
 return array(
-	MH\DevKit\Features\Foundation\FoundationFeature::class,
+	MH\DevKit\Features\MhdkPoc\MhdkPocFeature::class,
 );

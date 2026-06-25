@@ -14,7 +14,7 @@ MH Dev Kit provides a modular architecture for custom WordPress features:
 
 * Composer PSR-4 autoloading (no extra dependencies)
 * MVP feature folders: Models, Presenters, Views, Assets
-* Foundation PoC: admin settings, custom post types, Gutenberg blocks
+* MHDK-POC: admin settings, custom post types, Gutenberg blocks
 
 == Installation ==
 
@@ -25,7 +25,7 @@ MH Dev Kit provides a modular architecture for custom WordPress features:
 
 = 0.2.0 =
 * Composer + MVP architecture
-* Foundation feature: 3 blocks, 2 CPTs, admin settings
+* MHDK-POC feature: 3 blocks, 2 CPTs, MHDK Settings & MHDK Content admin menus
 
 = 0.1.0 =
 * Initial scaffold

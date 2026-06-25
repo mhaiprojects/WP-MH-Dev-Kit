@@ -21,3 +21,11 @@ All notable requests and project changes.
 - Admin menus: **MH Dev Kit** + **MH Dev Kit Content**
 - No npm/webpack; block editor JS uses bundled `wp.*` globals
 - `./scripts/composer-mh-dev-kit.sh` helper added
+
+### Core admin + MHDK-POC rename (v0.3.0)
+
+- Renamed **Foundation** feature → **MHDK-POC** (`src/Features/MhdkPoc/`)
+- Core admin menus: **MHDK Settings** (`mhdk-settings`) and **MHDK Content** (`mhdk-content`)
+- `AdminMenuRegistrar` + `FeatureAdminContributorInterface` for feature settings subpages
+- Block category renamed to **MHDK**; editor preview via `blocks-editor.js` + inspector controls
+- Settings option migrated from `mhdk_foundation_settings` → `mhdk_poc_settings`
