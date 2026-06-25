@@ -8,8 +8,9 @@
 ```bash
 sudo usermod -aG docker $USER
 # Log out and back in (or reboot), then:
-docker info
-ddev version
+docker info          # Docker daemon reachable by your user
+ddev --version       # DDEV binary installed (no Docker required)
+ddev version         # DDEV + Docker stack OK (requires Docker access)
 ```
 
 ## First-time bootstrap

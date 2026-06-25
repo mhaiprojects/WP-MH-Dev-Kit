@@ -118,9 +118,16 @@ ddev ssh --service db
 
 ## `ddev version`
 
+Two different checks — do not confuse them:
+
+| Command | Purpose | Requires Docker? |
+|---------|---------|------------------|
+| `ddev --version` | DDEV binary version only (e.g. `ddev version v1.25.2`) | **No** |
+| `ddev version` | DDEV binary **and** component versions (Docker, etc.) | **Yes** |
+
 ```bash
-ddev version
-ddev --version    # DDEV version only
+ddev --version    # "Is DDEV installed?" — works without Docker
+ddev version      # "Can DDEV talk to Docker?" — fails if Docker unavailable
 ```
 
-Requires Docker daemon running.
+Official docs note: `ddev --version` is the concise alternative to the `ddev version` subcommand.
