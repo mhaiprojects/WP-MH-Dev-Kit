@@ -13,6 +13,8 @@ ddev --version       # DDEV binary installed (no Docker required)
 ddev version         # DDEV + Docker stack OK (requires Docker access)
 ```
 
+If you are already in the `docker` group but `docker info` fails in the current terminal, either log out/in or run commands via `sg docker -c "..."`. The setup script handles this automatically.
+
 ## First-time bootstrap
 
 From the project root:
