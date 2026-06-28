@@ -70,6 +70,17 @@ In **WooCommerce → Settings**:
 
 Add products under **Products → Add new** when ready.
 
+### Shepparton local produce catalog
+
+Seed 10 in-demand Goulburn Valley products (with vendor details in descriptions):
+
+```bash
+chmod +x scripts/seed-shepparton-products.sh
+./scripts/seed-shepparton-products.sh
+```
+
+Sets store region to Shepparton VIC / AUD. Safe to re-run (skips if products already seeded).
+
 ### Future payment gateways
 
 Install later under **Plugins → Add new** (do not enable until configured):
