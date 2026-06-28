@@ -36,6 +36,10 @@ run_setup() {
   ddev wp plugin activate mh-dev-kit
 
   echo ""
+  echo "==> Setting up WooCommerce store (COD checkout)..."
+  "$ROOT/scripts/setup-woocommerce.sh"
+
+  echo ""
   ddev describe
   echo ""
   echo "Site:  https://cursor-wpdev2.ddev.site"

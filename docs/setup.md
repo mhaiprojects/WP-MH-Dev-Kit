@@ -31,6 +31,53 @@ This runs the official DDEV WordPress flow (see [ddev-docs/wordpress-quickstart.
 3. `ddev wp core download`
 4. `ddev wp core install` with `$DDEV_PRIMARY_URL`
 5. `ddev wp plugin activate mh-dev-kit`
+6. `./scripts/setup-woocommerce.sh` — WooCommerce, Storefront theme, COD-only checkout
+
+## E-commerce setup
+
+WooCommerce and Storefront are **not in git** (see git tracking policy). Install or refresh the shop with:
+
+```bash
+chmod +x scripts/setup-woocommerce.sh
+./scripts/setup-woocommerce.sh
+```
+
+This script:
+
+- Installs and activates **WooCommerce** and the **Storefront** theme
+- Creates shop, cart, checkout, and my-account pages
+- Enables **Cash on delivery** as the only payment method (BACS and Cheque disabled)
+- Sets baseline store options (USD, US address defaults, catalog live but empty)
+- Keeps **mh-dev-kit** active
+
+### Store URLs
+
+| Page | URL |
+|------|-----|
+| Shop | https://cursor-wpdev2.ddev.site/shop/ |
+| Cart | https://cursor-wpdev2.ddev.site/cart/ |
+| Checkout | https://cursor-wpdev2.ddev.site/checkout/ |
+| My account | https://cursor-wpdev2.ddev.site/my-account/ |
+
+### Post-setup checklist
+
+In **WooCommerce → Settings**:
+
+1. **General** — confirm store address and currency
+2. **Products** — review catalog/display options
+3. **Shipping** — add zones/rates if needed (COD works without online payment)
+4. **Payments** — confirm only **Cash on delivery** is enabled
+
+Add products under **Products → Add new** when ready.
+
+### Future payment gateways
+
+Install later under **Plugins → Add new** (do not enable until configured):
+
+- [WooCommerce Stripe](https://wordpress.org/plugins/woocommerce-gateway-stripe/)
+- [WooCommerce PayPal Payments](https://wordpress.org/plugins/woocommerce-paypal-payments/)
+
+Enable new gateways under **WooCommerce → Settings → Payments**. Keep **Cash on delivery** enabled as a fallback if desired.
 
 ## URLs
 

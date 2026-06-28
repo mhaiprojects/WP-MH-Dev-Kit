@@ -29,3 +29,9 @@ All notable requests and project changes.
 - `AdminMenuRegistrar` + `FeatureAdminContributorInterface` for feature settings subpages
 - Block category renamed to **MHDK**; editor preview via `blocks-editor.js` + inspector controls
 - Settings option migrated from `mhdk_foundation_settings` → `mhdk_poc_settings`
+
+### WooCommerce store — COD checkout
+
+- Added `scripts/setup-woocommerce.sh`: WooCommerce + Storefront, COD-only payments, store pages
+- Wired into `scripts/setup-wordpress.sh` for one-command bootstrap
+- Documented shop URLs, post-setup checklist, and future Stripe/PayPal path in `docs/setup.md`
