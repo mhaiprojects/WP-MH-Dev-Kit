@@ -40,3 +40,9 @@ All notable requests and project changes.
 
 - Added `scripts/seed-shepparton-products.sh`: 10 Goulburn Valley products with vendor details in descriptions
 - Store region set to Shepparton VIC, currency AUD
+
+### Order Menu feature (v0.4.0)
+
+- WooCommerce bulk-order table shortcode `[mhdk_order_menu]` with category, ids, or slugs filters
+- Nonce-validated cart submission; PoC page at `/bulk-order-menu/`
+- Extended Shepparton seed catalog to 20 products for demo

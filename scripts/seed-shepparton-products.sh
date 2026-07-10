@@ -19,7 +19,7 @@ run_seed() {
   ddev wp option update woocommerce_store_postcode "3630"
 
   EXISTING=$(ddev wp post list --post_type=product --meta_key=_shepparton_seed --meta_value=1 --format=count --user=1 2>/dev/null || echo "0")
-  if [ "${EXISTING}" -ge 10 ]; then
+  if [ "${EXISTING}" -ge 20 ]; then
     echo "Shepparton seed products already exist (${EXISTING} found). Skipping."
     ddev wp post list --post_type=product --meta_key=_shepparton_seed --meta_value=1 --fields=ID,post_title,post_name --user=1
     exit 0
@@ -178,6 +178,138 @@ C/O Shepparton Farmers Market, Maude Street Mall, Shepparton VIC 3630<br>
 Phone: (03) 5821 9900<br>
 Email: boxes@gvgrowers.com.au<br>
 Order by Thursday for Saturday market pickup; COD delivery Shepparton &amp; Mooroopna</p>"
+
+  create_product "hass-avocados-each" \
+    "Hass Avocados (each)" \
+    "2.20" \
+    "Creamy Hass avocados — strong café and household demand." \
+    "<p>Ripening Hass avocados from irrigated Goulburn Valley groves.</p>
+<h3>Vendor details</h3>
+<p><strong>Murray Valley Avocados</strong><br>
+56 Poplar Avenue, Shepparton VIC 3630<br>
+Phone: (03) 5821 4412<br>
+Email: sales@murrayvalleyavo.com.au<br>
+Shepparton Farmers Market Saturdays</p>"
+
+  create_product "bananas-1kg" \
+    "Bananas (1 kg)" \
+    "3.90" \
+    "Everyday fruit staple with steady wholesale demand." \
+    "<p>Sweet bananas supplied through regional produce distributors serving Shepparton retailers.</p>
+<h3>Vendor details</h3>
+<p><strong>Goulburn Valley Banana Traders</strong><br>
+22 Welsford Street, Shepparton VIC 3630<br>
+Phone: (03) 5821 2290<br>
+Email: orders@gvbananas.com.au<br>
+Wholesale Mon–Fri; market stall alternate Saturdays</p>"
+
+  create_product "brown-onions-1kg" \
+    "Brown Onions (1 kg)" \
+    "2.80" \
+    "Pantry essential — high volume seller." \
+    "<p>Brushed brown onions from Goulburn Valley paddocks.</p>
+<h3>Vendor details</h3>
+<p><strong>Kialla Onion Growers</strong><br>
+1800 Goulburn Valley Highway, Kialla VIC 3631<br>
+Phone: (03) 5823 5501<br>
+Email: onions@kiallagrowers.com.au<br>
+Farm gate Wed–Sat; Shepparton market Saturdays</p>"
+
+  create_product "brushed-potatoes-2kg" \
+    "Brushed Potatoes (2 kg)" \
+    "4.50" \
+    "Versatile brushed potatoes — reliable bulk seller." \
+    "<p>Washed brushed potatoes ideal for roasting, mashing, and chips.</p>
+<h3>Vendor details</h3>
+<p><strong>Tatura Potato Farm</strong><br>
+77 Hogan Road, Tatura VIC 3616<br>
+Phone: (03) 5824 3310<br>
+Email: spuds@taturapotato.com.au<br>
+Tatura &amp; Shepparton markets</p>"
+
+  create_product "carrots-1kg" \
+    "Carrots (1 kg bunch)" \
+    "3.20" \
+    "Sweet carrots — popular with families and schools." \
+    "<p>Fresh carrot bunches from Shepparton irrigation district growers.</p>
+<h3>Vendor details</h3>
+<p><strong>GV Root Crop Co.</strong><br>
+14 Industrial Avenue, Shepparton VIC 3630<br>
+Phone: (03) 5820 7711<br>
+Email: carrots@gvrootcrop.com.au<br>
+Market Saturdays; local delivery Tue &amp; Fri</p>"
+
+  create_product "broccoli-each" \
+    "Broccoli (each)" \
+    "3.60" \
+    "Green broccoli heads — winter brassica in demand." \
+    "<p>Firm broccoli heads harvested within 24 hours of market.</p>
+<h3>Vendor details</h3>
+<p><strong>Shepparton Greens</strong><br>
+9 Broccoli Drive, Mooroopna VIC 3629<br>
+Phone: (03) 5825 1188<br>
+Email: greens@sheppartongreens.com.au<br>
+Mooroopna &amp; Shepparton Farmers Market</p>"
+
+  create_product "lemons-1kg" \
+    "Lemons (1 kg)" \
+    "4.00" \
+    "Juicy lemons for home and café use." \
+    "<p>Sun-ripened lemons from Goulburn Valley citrus blocks.</p>
+<h3>Vendor details</h3>
+<p><strong>Citrus Lane Orchard</strong><br>
+300 Lemnos Road, Shepparton VIC 3630<br>
+Phone: (03) 5821 6602<br>
+Email: lemons@citruslane.com.au<br>
+Market stall Saturdays 8am–12:30pm</p>"
+
+  create_product "greek-yoghurt-1kg" \
+    "Greek Yoghurt (1 kg tub)" \
+    "6.50" \
+    "Thick Greek yoghurt — dairy category bestseller." \
+    "<p>Creamy Greek-style yoghurt from Goulburn Valley milk.</p>
+<h3>Vendor details</h3>
+<p><strong>Valley Culture Dairy</strong><br>
+45 Numurkah Road, Shepparton VIC 3630<br>
+Phone: (03) 5820 9933<br>
+Email: culture@valleydairy.com.au<br>
+Stockists across Shepparton; market fridge Saturdays</p>"
+
+  create_product "sourdough-loaf" \
+    "Artisan Sourdough Loaf" \
+    "7.00" \
+    "Crusty sourdough — sells out at weekend markets." \
+    "<p>Slow-fermented sourdough baked fresh for Saturday markets.</p>
+<h3>Vendor details</h3>
+<p><strong>Maude Street Bakehouse</strong><br>
+88 Maude Street, Shepparton VIC 3630<br>
+Phone: (03) 5821 8801<br>
+Email: hello@maudestreetbake.com.au<br>
+Bakery 6am–3pm daily; market pop-up Saturdays</p>"
+
+  create_product "extra-virgin-olive-oil-750ml" \
+    "Extra Virgin Olive Oil (750 ml)" \
+    "18.00" \
+    "Cold-pressed olive oil — gift and pantry item." \
+    "<p>Extra virgin olive oil from Murray-Goulburn grove plantings.</p>
+<h3>Vendor details</h3>
+<p><strong>GV Olive Grove</strong><br>
+2100 Midland Highway, Kialla VIC 3631<br>
+Phone: (03) 5823 7700<br>
+Email: oil@gvolive.com.au<br>
+Farm shop Fri–Sun; Shepparton market monthly</p>"
+
+  create_product "free-range-chicken-whole" \
+    "Free Range Whole Chicken (approx. 1.8 kg)" \
+    "16.50" \
+    "Whole free-range chicken — popular Sunday roast item." \
+    "<p>Pasture-raised whole chickens processed locally for Shepparton customers.</p>
+<h3>Vendor details</h3>
+<p><strong>Shepparton Poultry Farm</strong><br>
+600 River Road, Shepparton VIC 3630<br>
+Phone: (03) 5822 4400<br>
+Email: orders@sheppartonpoultry.com.au<br>
+Pre-order Thu for Sat pickup; COD at market</p>"
 
   echo ""
   echo "==> Product catalog"

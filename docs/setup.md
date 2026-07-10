@@ -20,9 +20,26 @@ If you are already in the `docker` group but `docker info` fails in the current 
 From the project root:
 
 ```bash
-chmod +x scripts/setup-wordpress.sh
+chmod +x scripts/setup-wordpress.sh scripts/setup-woocommerce.sh scripts/seed-shepparton-products.sh
 ./scripts/setup-wordpress.sh
 ```
+
+### Start services (daily)
+
+To start Docker/DDEV and the site after a reboot or when containers are stopped:
+
+```bash
+ddev start
+```
+
+That single command starts the web container, database, router, and ssh-agent. Then open the site:
+
+```bash
+ddev launch shop/              # WooCommerce product catalog
+ddev launch bulk-order-menu/   # Bulk order menu PoC
+```
+
+Full first-time setup (WordPress + WooCommerce + COD) is handled by `./scripts/setup-wordpress.sh`, which also runs `./scripts/setup-woocommerce.sh`. Seed local produce with `./scripts/seed-shepparton-products.sh`.
 
 This runs the official DDEV WordPress flow (see [ddev-docs/wordpress-quickstart.md](ddev-docs/wordpress-quickstart.md)):
 
@@ -80,6 +97,22 @@ chmod +x scripts/seed-shepparton-products.sh
 ```
 
 Sets store region to Shepparton VIC / AUD. Safe to re-run (skips if products already seeded).
+
+### Order Menu (bulk order table)
+
+The **mh-dev-kit** Order Menu feature lists WooCommerce products in a restaurant-style table (name, description, cost, quantity) for one-page bulk ordering.
+
+**PoC page:** https://cursor-wpdev2.ddev.site/bulk-order-menu/
+
+Shortcode examples:
+
+```
+[mhdk_order_menu category="shepparton-local-produce"]
+[mhdk_order_menu ids="19,20,21"]
+[mhdk_order_menu slugs="goulburn-valley-pink-lady-apples-1kg,cherry-tomatoes-500g"]
+```
+
+Submissions are nonce-protected; only products matching the shortcode filter can be added to cart. Checkout uses COD.
 
 ### Future payment gateways
 
