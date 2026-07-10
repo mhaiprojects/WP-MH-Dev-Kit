@@ -23,4 +23,4 @@ Attributes (first match wins): `ids`, then `slugs`, then `category`. Omit all to
 
 Auto-created at `/bulk-order-menu/` on first load with the Shepparton category shortcode.
 
-Each row includes **− / + / Clear** quantity controls and a **Quantity in Cart** readout. After adding items, the user stays on the order menu page (WooCommerce success notice shown).
+Each row includes **− / + / Clear** quantity controls, an **Add Item** button (single-line add), and a **Quantity in Cart** readout. After adding items, the user stays on the order menu page (WooCommerce success notice shown).

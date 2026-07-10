@@ -81,6 +81,23 @@
 	font-size: 0.85rem;
 }
 
+.mhdk-order-menu__qty-btn--add {
+	min-width: auto;
+	padding: 0 0.75rem;
+	font-size: 0.85rem;
+	background: #2c6e49;
+	border-color: #2c6e49;
+	color: #fff;
+	font-weight: 600;
+}
+
+.mhdk-order-menu__qty-btn--add:hover,
+.mhdk-order-menu__qty-btn--add:focus {
+	background: #245a3b;
+	border-color: #245a3b;
+	color: #fff;
+}
+
 .mhdk-order-menu__cart-qty {
 	margin: 0;
 	font-size: 0.85rem;

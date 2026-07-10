@@ -80,6 +80,12 @@ if ( ! defined( 'ABSPATH' ) ) {
 										class="mhdk-order-menu__qty-btn mhdk-order-menu__qty-btn--clear"
 										data-action="clear"
 									><?php esc_html_e( 'Clear', 'mh-dev-kit' ); ?></button>
+									<button
+										type="submit"
+										name="mhdk_order_menu_single"
+										value="<?php echo esc_attr( (string) $row['id'] ); ?>"
+										class="mhdk-order-menu__qty-btn mhdk-order-menu__qty-btn--add"
+									><?php esc_html_e( 'Add Item', 'mh-dev-kit' ); ?></button>
 								</div>
 								<p class="mhdk-order-menu__cart-qty">
 									<?php esc_html_e( 'Quantity in Cart', 'mh-dev-kit' ); ?>:

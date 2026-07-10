@@ -28,7 +28,7 @@ final class OrderMenuPresenter {
 	public function register(): void {
 		add_shortcode( 'mhdk_order_menu', array( $this, 'render_shortcode' ) );
 		add_action( 'init', array( $this, 'maybe_create_poc_page' ) );
-		add_action( 'template_redirect', array( $this, 'handle_bulk_add' ) );
+		add_action( 'template_redirect', array( $this, 'handle_cart_submission' ) );
 		add_action( 'wp_enqueue_scripts', array( $this, 'enqueue_assets' ) );
 	}
 
@@ -119,12 +119,15 @@ final class OrderMenuPresenter {
 		}
 	}
 
-	public function handle_bulk_add(): void {
+	public function handle_cart_submission(): void {
 		if ( 'POST' !== ( $_SERVER['REQUEST_METHOD'] ?? '' ) ) {
 			return;
 		}
 
-		if ( empty( $_POST['mhdk_order_menu_submit'] ) ) {
+		$is_bulk   = ! empty( $_POST['mhdk_order_menu_submit'] );
+		$single_id = isset( $_POST['mhdk_order_menu_single'] ) ? absint( $_POST['mhdk_order_menu_single'] ) : 0;
+
+		if ( ! $is_bulk && $single_id <= 0 ) {
 			return;
 		}
 
@@ -147,22 +150,37 @@ final class OrderMenuPresenter {
 			? wp_unslash( $_POST['mhdk_qty'] )
 			: array();
 
+		if ( $single_id > 0 ) {
+			$raw_qty = array(
+				$single_id => $raw_qty[ $single_id ] ?? 0,
+			);
+		}
+
 		$quantities = $this->model->sanitize_quantities( $raw_qty );
 		$result     = $this->model->add_to_cart( $atts, $quantities );
 
 		$redirect = wp_get_referer() ?: home_url( '/' );
 
 		if ( $result['added'] > 0 ) {
-			wc_add_notice(
-				sprintf(
-					/* translators: %d: number of line items added */
-					_n( '%d item added to your cart.', '%d items added to your cart.', $result['added'], 'mh-dev-kit' ),
-					$result['added']
-				),
-				'success'
-			);
+			if ( $single_id > 0 ) {
+				wc_add_notice( __( 'Item added to your cart.', 'mh-dev-kit' ), 'success' );
+			} else {
+				wc_add_notice(
+					sprintf(
+						/* translators: %d: number of line items added */
+						_n( '%d item added to your cart.', '%d items added to your cart.', $result['added'], 'mh-dev-kit' ),
+						$result['added']
+					),
+					'success'
+				);
+			}
 		} elseif ( 0 === $result['added'] ) {
-			wc_add_notice( __( 'Enter a quantity for at least one product.', 'mh-dev-kit' ), 'notice' );
+			wc_add_notice(
+				$single_id > 0
+					? __( 'Enter a quantity before adding this item.', 'mh-dev-kit' )
+					: __( 'Enter a quantity for at least one product.', 'mh-dev-kit' ),
+				'notice'
+			);
 		}
 
 		foreach ( $result['messages'] as $message ) {
