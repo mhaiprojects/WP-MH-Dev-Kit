@@ -142,6 +142,30 @@ final class OrderMenuModel {
 		return $clean;
 	}
 
+	/**
+	 * Cart quantities for the given product IDs.
+	 *
+	 * @param array<int, int> $product_ids Product IDs.
+	 * @return array<int, int>
+	 */
+	public function get_cart_quantities( array $product_ids ): array {
+		$quantities = array_fill_keys( $product_ids, 0 );
+
+		if ( ! function_exists( 'WC' ) || ! WC()->cart ) {
+			return $quantities;
+		}
+
+		foreach ( WC()->cart->get_cart() as $item ) {
+			$product_id = (int) ( $item['product_id'] ?? 0 );
+
+			if ( isset( $quantities[ $product_id ] ) ) {
+				$quantities[ $product_id ] += (int) ( $item['quantity'] ?? 0 );
+			}
+		}
+
+		return $quantities;
+	}
+
 	public function menu_description( \WC_Product $product ): string {
 		$short = $product->get_short_description();
 

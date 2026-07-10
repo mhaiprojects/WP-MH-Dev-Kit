@@ -30,7 +30,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 			</thead>
 			<tbody>
 				<?php foreach ( $rows as $row ) : ?>
-					<tr>
+					<tr class="mhdk-order-menu__row" data-product-id="<?php echo esc_attr( (string) $row['id'] ); ?>">
 						<td class="mhdk-order-menu__name" data-label="<?php esc_attr_e( 'Product Name', 'mh-dev-kit' ); ?>">
 							<strong><?php echo esc_html( (string) $row['name'] ); ?></strong>
 						</td>
@@ -41,25 +41,51 @@ if ( ! defined( 'ABSPATH' ) ) {
 							<?php echo wp_kses_post( (string) $row['price_html'] ); ?>
 						</td>
 						<td class="mhdk-order-menu__qty" data-label="<?php esc_attr_e( 'Quantity', 'mh-dev-kit' ); ?>">
-							<label class="screen-reader-text" for="mhdk-qty-<?php echo esc_attr( (string) $row['id'] ); ?>">
-								<?php
-								printf(
-									/* translators: %s: product name */
-									esc_html__( 'Quantity for %s', 'mh-dev-kit' ),
-									esc_html( (string) $row['name'] )
-								);
-								?>
-							</label>
-							<input
-								type="number"
-								id="mhdk-qty-<?php echo esc_attr( (string) $row['id'] ); ?>"
-								name="mhdk_qty[<?php echo esc_attr( (string) $row['id'] ); ?>]"
-								min="0"
-								max="99"
-								step="1"
-								value="0"
-								inputmode="numeric"
-							/>
+							<div class="mhdk-order-menu__qty-panel">
+								<label class="screen-reader-text" for="mhdk-qty-<?php echo esc_attr( (string) $row['id'] ); ?>">
+									<?php
+									printf(
+										/* translators: %s: product name */
+										esc_html__( 'Quantity for %s', 'mh-dev-kit' ),
+										esc_html( (string) $row['name'] )
+									);
+									?>
+								</label>
+								<div class="mhdk-order-menu__qty-controls">
+									<button
+										type="button"
+										class="mhdk-order-menu__qty-btn mhdk-order-menu__qty-btn--decrease"
+										data-action="decrease"
+										aria-label="<?php esc_attr_e( 'Decrease quantity', 'mh-dev-kit' ); ?>"
+									>−</button>
+									<input
+										type="number"
+										class="mhdk-order-menu__qty-input"
+										id="mhdk-qty-<?php echo esc_attr( (string) $row['id'] ); ?>"
+										name="mhdk_qty[<?php echo esc_attr( (string) $row['id'] ); ?>]"
+										min="0"
+										max="99"
+										step="1"
+										value="0"
+										inputmode="numeric"
+									/>
+									<button
+										type="button"
+										class="mhdk-order-menu__qty-btn mhdk-order-menu__qty-btn--increase"
+										data-action="increase"
+										aria-label="<?php esc_attr_e( 'Increase quantity', 'mh-dev-kit' ); ?>"
+									>+</button>
+									<button
+										type="button"
+										class="mhdk-order-menu__qty-btn mhdk-order-menu__qty-btn--clear"
+										data-action="clear"
+									><?php esc_html_e( 'Clear', 'mh-dev-kit' ); ?></button>
+								</div>
+								<p class="mhdk-order-menu__cart-qty">
+									<?php esc_html_e( 'Quantity in Cart', 'mh-dev-kit' ); ?>:
+									<span class="mhdk-order-menu__cart-qty-value"><?php echo esc_html( (string) (int) $row['cart_qty'] ); ?></span>
+								</p>
+							</div>
 						</td>
 					</tr>
 				<?php endforeach; ?>

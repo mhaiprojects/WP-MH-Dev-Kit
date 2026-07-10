@@ -54,14 +54,23 @@ final class OrderMenuPresenter {
 		}
 
 		$rows = array();
+		$ids  = array();
 
 		foreach ( $products as $product ) {
-			$rows[] = array(
-				'id'          => $product->get_id(),
+			$ids[] = $product->get_id();
+		}
+
+		$cart_quantities = $this->model->get_cart_quantities( $ids );
+
+		foreach ( $products as $product ) {
+			$product_id = $product->get_id();
+			$rows[]     = array(
+				'id'          => $product_id,
 				'name'        => $product->get_name(),
 				'description' => $this->model->menu_description( $product ),
 				'price_html'  => $product->get_price_html(),
 				'price'       => $product->get_price(),
+				'cart_qty'    => $cart_quantities[ $product_id ] ?? 0,
 			);
 		}
 
@@ -152,7 +161,6 @@ final class OrderMenuPresenter {
 				),
 				'success'
 			);
-			$redirect = wc_get_cart_url();
 		} elseif ( 0 === $result['added'] ) {
 			wc_add_notice( __( 'Enter a quantity for at least one product.', 'mh-dev-kit' ), 'notice' );
 		}
@@ -180,6 +188,14 @@ final class OrderMenuPresenter {
 			'mhdk-order-menu',
 			'OrderMenu',
 			'css/order-menu.css'
+		);
+
+		AssetRegistrar::enqueue_script(
+			'mhdk-order-menu',
+			'OrderMenu',
+			'js/order-menu.js',
+			array(),
+			false
 		);
 	}
 

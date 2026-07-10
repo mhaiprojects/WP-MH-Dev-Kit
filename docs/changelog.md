@@ -46,3 +46,8 @@ All notable requests and project changes.
 - WooCommerce bulk-order table shortcode `[mhdk_order_menu]` with category, ids, or slugs filters
 - Nonce-validated cart submission; PoC page at `/bulk-order-menu/`
 - Extended Shepparton seed catalog to 20 products for demo
+
+### Order Menu quantity controls
+
+- Per-item decrease, increase, and clear buttons; Quantity in Cart display under controls
+- Stay on order menu page after bulk add (redirect to referer, not cart)
