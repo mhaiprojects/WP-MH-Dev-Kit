@@ -114,6 +114,8 @@ Shortcode examples:
 
 Submissions are nonce-protected; only products matching the shortcode filter can be added to cart. Checkout uses COD.
 
+**Admin:** MHDK Settings → **Order Menu** (options + shortcode generator). MHDK Content → **Saved Menus**. Product edit: menu description, seasonal dates.
+
 ### Future payment gateways
 
 Install later under **Plugins → Add new** (do not enable until configured):

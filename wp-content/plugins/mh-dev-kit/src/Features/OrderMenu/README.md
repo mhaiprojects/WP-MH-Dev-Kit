@@ -6,21 +6,44 @@ Bulk-order WooCommerce products from a restaurant-style menu table.
 
 ```
 [mhdk_order_menu category="shepparton-local-produce"]
+[mhdk_order_menu menu="saturday-market"]
 [mhdk_order_menu ids="19,20,21"]
-[mhdk_order_menu slugs="goulburn-valley-pink-lady-apples-1kg,cherry-tomatoes-500g"]
+[mhdk_order_menu slugs="goulburn-valley-pink-lady-apples-1kg" orderby="price" order="ASC" show_image="yes"]
 ```
 
-Attributes (first match wins): `ids`, then `slugs`, then `category`. Omit all to list up to 100 purchasable products.
+Attributes (first match wins for source): `menu`, `ids`, `slugs`, `category`. Also: `orderby`, `order`, `show_image`.
 
-## Security
+## Features (plan items #1–#20)
 
-- WordPress nonce on form submit
-- Quantities sanitized (1–99 per line)
-- Only products matching the shortcode filter can be added to cart
-- Redirect via `wp_safe_redirect`
+- AJAX add to cart with live **Quantity in Cart** (#1)
+- Line subtotals and order total (#2)
+- Unit column parsed from product title (#3)
+- Stock badges (#4)
+- Clear all (#5)
+- Loading state on Add Item (#6)
+- Search bar (#7)
+- Category section headers (#8)
+- Sort via `orderby` / `order` (#9)
+- Preserve qty after add (setting) (#10)
+- Optional thumbnails (#11)
+- Print stylesheet (#12)
+- Reorder last order button (#13)
+- MHDK Settings → Order Menu (#14)
+- Shortcode generator (#15)
+- Menu description override on products (#16)
+- Saved menus CPT (#17)
+- Gutenberg block `mh-dev-kit/order-menu` (#18)
+- Seasonal availability dates on products (#19)
+- Bulk order source meta on checkout (#20)
+
+## Admin
+
+**MHDK Settings → Order Menu** — global options and shortcode generator.
+
+**MHDK Content → Saved Menus** — ordered product ID lists for `menu="slug"` shortcodes.
+
+Product edit screen: **Order menu description**, **Available from/until**.
 
 ## PoC page
 
-Auto-created at `/bulk-order-menu/` on first load with the Shepparton category shortcode.
-
-Each row includes **− / + / Clear** quantity controls, an **Add Item** button (single-line add), and a **Quantity in Cart** readout. After adding items, the user stays on the order menu page (WooCommerce success notice shown).
+`/bulk-order-menu/` — auto-created with Shepparton category shortcode.

@@ -1,0 +1,21 @@
+{
+	"$schema": "https://schemas.wp.org/trunk/block.json",
+	"apiVersion": 3,
+	"name": "mh-dev-kit/order-menu",
+	"title": "Bulk Order Menu",
+	"category": "mhdk",
+	"icon": "list-view",
+	"description": "Restaurant-style bulk order table for WooCommerce products.",
+	"textdomain": "mh-dev-kit",
+	"attributes": {
+		"category": { "type": "string", "default": "" },
+		"menu": { "type": "string", "default": "" },
+		"ids": { "type": "string", "default": "" },
+		"slugs": { "type": "string", "default": "" },
+		"orderby": { "type": "string", "default": "title" },
+		"order": { "type": "string", "default": "ASC" },
+		"showImage": { "type": "boolean", "default": false }
+	},
+	"supports": { "html": false },
+	"render": "file:./render.php"
+}

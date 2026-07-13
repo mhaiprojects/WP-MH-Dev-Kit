@@ -51,3 +51,10 @@ All notable requests and project changes.
 
 - Per-item decrease, increase, and clear buttons; Quantity in Cart display under controls
 - Stay on order menu page after bulk add (redirect to referer, not cart)
+
+### Order Menu v0.5.0 (plan items #1–#20)
+
+- AJAX cart, line subtotals, unit column, stock badges, search, category headers, sort attrs
+- Clear all, loading states, print CSS, reorder last order, optional thumbnails
+- MHDK Settings → Order Menu, shortcode generator, saved menus CPT, Gutenberg block
+- Product meta: menu description, seasonal availability; bulk order source on checkout
