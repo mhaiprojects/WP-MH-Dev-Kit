@@ -1,6 +1,6 @@
 <?php
 /**
- * Renders feature view partials.
+ * Renders view partials.
  *
  * @package MH\DevKit\Core
  */
@@ -14,7 +14,7 @@ final class ViewRenderer {
 	/**
 	 * Render a view and return HTML.
 	 *
-	 * @param string               $relative_path Path under src/Features/, e.g. Foundation/Views/foo.php
+	 * @param string               $relative_path Path under src/, e.g. Modules/Core/Features/MhdkPoc/Views/foo.php or Core/Views/admin/foo.php.
 	 * @param array<string, mixed> $data          Variables extracted into the partial.
 	 */
 	public static function render( string $relative_path, array $data = array() ): string {
@@ -35,7 +35,7 @@ final class ViewRenderer {
 	/**
 	 * Echo rendered view.
 	 *
-	 * @param string               $relative_path Path under src/Features/.
+	 * @param string               $relative_path Path under src/.
 	 * @param array<string, mixed> $data          View data.
 	 */
 	public static function display( string $relative_path, array $data = array() ): void {
@@ -44,12 +44,6 @@ final class ViewRenderer {
 	}
 
 	private static function resolve_path( string $relative_path ): string {
-		$relative_path = ltrim( $relative_path, '/' );
-
-		if ( str_starts_with( $relative_path, 'Core/' ) ) {
-			return MH_DEV_KIT_PATH . 'src/' . $relative_path;
-		}
-
-		return MH_DEV_KIT_PATH . 'src/Features/' . $relative_path;
+		return MH_DEV_KIT_PATH . 'src/' . ltrim( str_replace( '\\', '/', $relative_path ), '/' );
 	}
 }

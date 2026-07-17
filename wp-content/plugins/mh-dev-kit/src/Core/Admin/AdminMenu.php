@@ -13,7 +13,11 @@ final class AdminMenu {
 
 	public const SETTINGS_SLUG = 'mhdk-settings';
 
-	public const CONTENT_SLUG = 'mhdk-content';
+	/** Core module content hub submenu slug (under MHDK Settings). */
+	public const CORE_CONTENT_SLUG = 'mhdk-core-content';
+
+	/** Commerce module content submenu slug (under MHDK Settings). */
+	public const COMMERCE_CONTENT_SLUG = 'mhdk-commerce-content';
 
 	public const BLOCK_CATEGORY = 'mhdk';
 

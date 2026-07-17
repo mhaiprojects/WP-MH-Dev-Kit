@@ -58,3 +58,12 @@ All notable requests and project changes.
 - Clear all, loading states, print CSS, reorder last order, optional thumbnails
 - MHDK Settings → Order Menu, shortcode generator, saved menus CPT, Gutenberg block
 - Product meta: menu description, seasonal availability; bulk order source on checkout
+
+### Module layer refactor (v0.6.0)
+
+- Plugin → Module → Feature architecture; `config/modules.php` replaces `config/features.php`
+- **Core** module hosts MHDK-POC reference features; **Commerce** module hosts Order Menu
+- Single top-level **MHDK Settings** menu; modules add subpages only (removed MHDK Content top-level)
+- **MHDK Settings → Modules** page to enable/disable modules at runtime
+- Features moved to `src/Modules/{Module}/Features/`; namespaces updated
+- `ModuleAdminContributorInterface` replaces `FeatureAdminContributorInterface`
