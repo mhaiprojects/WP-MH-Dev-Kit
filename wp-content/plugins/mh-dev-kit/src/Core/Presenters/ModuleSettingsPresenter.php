@@ -11,6 +11,7 @@ namespace MH\DevKit\Core\Presenters;
 
 use MH\DevKit\Core\Admin\AdminMenu;
 use MH\DevKit\Core\Admin\AdminMenuRegistrar;
+use MH\DevKit\Core\Admin\ModulesListTable;
 use MH\DevKit\Core\Models\ModuleSettingsModel;
 use MH\DevKit\Core\ModuleLoader;
 use MH\DevKit\Core\ViewRenderer;
@@ -69,13 +70,15 @@ final class ModuleSettingsPresenter {
 			);
 		}
 
+		$table = new ModulesListTable( $modules, $model->get_all( $classes ), ModuleSettingsModel::OPTION_KEY );
+		$table->prepare_items();
+
 		ViewRenderer::display(
 			'Core/Views/admin/modules-page.php',
 			array(
 				'option_key' => ModuleSettingsModel::OPTION_KEY,
 				'page_slug'  => self::PAGE_SLUG,
-				'settings'   => $model->get_all( $classes ),
-				'modules'    => $modules,
+				'table'      => $table,
 				'version'    => MH_DEV_KIT_VERSION,
 			)
 		);

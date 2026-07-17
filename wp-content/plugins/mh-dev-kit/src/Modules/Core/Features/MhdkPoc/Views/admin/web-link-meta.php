@@ -11,17 +11,26 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 ?>
-<p>
-	<label for="mhdk_url"><strong><?php esc_html_e( 'URL', 'mh-dev-kit' ); ?></strong></label><br />
-	<input type="url" class="widefat" id="mhdk_url" name="mhdk_url" value="<?php echo esc_attr( $url ); ?>" required />
-</p>
-<p>
-	<label for="mhdk_description"><strong><?php esc_html_e( 'Description', 'mh-dev-kit' ); ?></strong></label><br />
-	<textarea class="widefat" id="mhdk_description" name="mhdk_description" rows="3"><?php echo esc_textarea( $description ); ?></textarea>
-</p>
-<p>
-	<label>
-		<input type="checkbox" name="mhdk_open_new_tab" value="1" <?php checked( $new_tab ); ?> />
-		<?php esc_html_e( 'Open in new tab', 'mh-dev-kit' ); ?>
-	</label>
-</p>
+<table class="form-table" role="presentation">
+	<tr>
+		<th scope="row"><label for="mhdk_url"><?php esc_html_e( 'URL', 'mh-dev-kit' ); ?></label></th>
+		<td>
+			<input type="url" class="regular-text widefat" id="mhdk_url" name="mhdk_url" value="<?php echo esc_attr( $url ); ?>" required />
+		</td>
+	</tr>
+	<tr>
+		<th scope="row"><label for="mhdk_description"><?php esc_html_e( 'Description', 'mh-dev-kit' ); ?></label></th>
+		<td>
+			<textarea class="large-text widefat" id="mhdk_description" name="mhdk_description" rows="3"><?php echo esc_textarea( $description ); ?></textarea>
+		</td>
+	</tr>
+	<tr>
+		<th scope="row"><?php esc_html_e( 'New tab', 'mh-dev-kit' ); ?></th>
+		<td>
+			<label>
+				<input type="checkbox" name="mhdk_open_new_tab" value="1" <?php checked( $new_tab ); ?> />
+				<?php esc_html_e( 'Open in new tab', 'mh-dev-kit' ); ?>
+			</label>
+		</td>
+	</tr>
+</table>

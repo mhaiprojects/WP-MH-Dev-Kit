@@ -55,15 +55,23 @@ final class SavedMenuPresenter {
 		$ids   = get_post_meta( $post->ID, SavedMenuModel::META_PRODUCT_IDS, true );
 		$value = is_array( $ids ) ? implode( ',', array_map( 'absint', $ids ) ) : '';
 
-		echo '<p><label for="mhdk_menu_product_ids">' . esc_html__( 'Product IDs (comma-separated, ordered)', 'mh-dev-kit' ) . '</label></p>';
+		echo '<table class="form-table" role="presentation">';
+		echo '<tr>';
+		echo '<th scope="row"><label for="mhdk_menu_product_ids">' . esc_html__( 'Product IDs', 'mh-dev-kit' ) . '</label></th>';
+		echo '<td>';
 		printf(
-			'<input type="text" class="widefat" id="mhdk_menu_product_ids" name="mhdk_menu_product_ids" value="%s" />',
+			'<input type="text" class="regular-text widefat" id="mhdk_menu_product_ids" name="mhdk_menu_product_ids" value="%s" />',
 			esc_attr( $value )
 		);
 		printf(
 			'<p class="description">%s</p>',
-			esc_html__( 'Shortcode: [mhdk_order_menu menu="' . $post->post_name . '"]', 'mh-dev-kit' )
+			esc_html__( 'Comma-separated product IDs in display order.', 'mh-dev-kit' )
 		);
+		printf(
+			'<p class="description">%s</p>',
+			esc_html( 'Shortcode: [mhdk_order_menu menu="' . $post->post_name . '"]' )
+		);
+		echo '</td></tr></table>';
 	}
 
 	public function save_meta( int $post_id, \WP_Post $post ): void {

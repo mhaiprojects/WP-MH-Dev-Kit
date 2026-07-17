@@ -1,6 +1,6 @@
 <?php
 /**
- * MHDK-POC settings (Settings API only; menu registered via Core).
+ * MHDK-POC settings (Settings API only; menu registered via Core module).
  *
  * @package MH\DevKit\Modules\Core\Features\MhdkPoc\Presenters
  */
@@ -10,9 +10,9 @@ declare(strict_types=1);
 namespace MH\DevKit\Modules\Core\Features\MhdkPoc\Presenters;
 
 use MH\DevKit\Core\Admin\AdminMenu;
+use MH\DevKit\Core\Admin\SettingsFieldRenderer;
 use MH\DevKit\Core\ViewRenderer;
 use MH\DevKit\Modules\Core\Features\MhdkPoc\Models\MhdkPocSettingsModel;
-use MH\DevKit\Shared\AssetRegistrar;
 
 final class PocSettingsPresenter {
 
@@ -22,7 +22,6 @@ final class PocSettingsPresenter {
 
 	public function register(): void {
 		add_action( 'admin_init', array( $this, 'register_settings' ) );
-		add_action( 'admin_enqueue_scripts', array( $this, 'enqueue_assets' ) );
 	}
 
 	public function register_settings(): void {
@@ -38,9 +37,9 @@ final class PocSettingsPresenter {
 
 		add_settings_section(
 			'mhdk_poc_main',
-			__( 'MHDK-POC Settings', AdminMenu::TEXT_DOMAIN ),
+			'',
 			static function (): void {
-				echo '<p>' . esc_html__( 'Defaults for MHDK-POC blocks and content types.', AdminMenu::TEXT_DOMAIN ) . '</p>';
+				echo '<p>' . esc_html__( 'Defaults for MHDK-POC blocks and content types.', 'mh-dev-kit' ) . '</p>';
 			},
 			MhdkPocSettingsModel::SETTINGS_SLUG
 		);
@@ -78,31 +77,23 @@ final class PocSettingsPresenter {
 		);
 	}
 
-	public function enqueue_assets( string $hook ): void {
-		if ( ! str_contains( $hook, MhdkPocSettingsModel::SETTINGS_SLUG ) ) {
-			return;
-		}
-
-		AssetRegistrar::enqueue_style(
-			'mhdk-poc-admin',
-			'Modules/Core/Features/MhdkPoc',
-			'css/foundation-admin.css'
-		);
-	}
-
 	public function render_settings(): void {
 		ViewRenderer::display(
 			'Modules/Core/Features/MhdkPoc/Views/settings-page.php',
 			array(
-				'option_key' => MhdkPocSettingsModel::OPTION_KEY,
-				'settings'   => $this->settings->get_all(),
-				'page_slug'  => MhdkPocSettingsModel::SETTINGS_SLUG,
-				'version'    => MH_DEV_KIT_VERSION,
+				'page_slug'    => MhdkPocSettingsModel::SETTINGS_SLUG,
+				'option_group' => 'mhdk_poc',
+				'footer_note'  => sprintf(
+					/* translators: %s: plugin version */
+					__( 'MH Dev Kit %s', 'mh-dev-kit' ),
+					MH_DEV_KIT_VERSION
+				),
 			)
 		);
 	}
 
 	public function field_callout_style(): void {
+		$key     = MhdkPocSettingsModel::OPTION_KEY;
 		$value   = (string) $this->settings->get( 'default_callout_style', 'info' );
 		$options = array(
 			'info'    => __( 'Info', AdminMenu::TEXT_DOMAIN ),
@@ -110,44 +101,35 @@ final class PocSettingsPresenter {
 			'success' => __( 'Success', AdminMenu::TEXT_DOMAIN ),
 		);
 
-		echo '<select name="' . esc_attr( MhdkPocSettingsModel::OPTION_KEY ) . '[default_callout_style]">';
-		foreach ( $options as $key => $label ) {
-			printf(
-				'<option value="%1$s" %2$s>%3$s</option>',
-				esc_attr( $key ),
-				selected( $value, $key, false ),
-				esc_html( $label )
-			);
-		}
-		echo '</select>';
+		SettingsFieldRenderer::select( $key . '[default_callout_style]', $options, $value );
+		echo '<p class="description">' . esc_html__( 'Used when a callout block does not specify a style.', 'mh-dev-kit' ) . '</p>';
 	}
 
 	public function field_web_links_new_tab(): void {
-		$checked = (bool) $this->settings->get( 'web_links_new_tab', true );
-		printf(
-			'<label><input type="checkbox" name="%1$s[web_links_new_tab]" value="1" %2$s /> %3$s</label>',
-			esc_attr( MhdkPocSettingsModel::OPTION_KEY ),
-			checked( $checked, true, false ),
-			esc_html__( 'Open web links in a new browser tab by default', AdminMenu::TEXT_DOMAIN )
+		$key = MhdkPocSettingsModel::OPTION_KEY;
+		SettingsFieldRenderer::checkbox(
+			$key . '[web_links_new_tab]',
+			(bool) $this->settings->get( 'web_links_new_tab', true ),
+			__( 'Open web links in a new browser tab by default', AdminMenu::TEXT_DOMAIN )
 		);
 	}
 
 	public function field_currency(): void {
-		$value = (string) $this->settings->get( 'menu_currency_symbol', '$' );
-		printf(
-			'<input type="text" class="regular-text" name="%1$s[menu_currency_symbol]" value="%2$s" />',
-			esc_attr( MhdkPocSettingsModel::OPTION_KEY ),
-			esc_attr( $value )
+		$key = MhdkPocSettingsModel::OPTION_KEY;
+		SettingsFieldRenderer::text(
+			$key . '[menu_currency_symbol]',
+			(string) $this->settings->get( 'menu_currency_symbol', '$' ),
+			'small-text',
+			__( 'Shown before prices in hospitality menu blocks.', 'mh-dev-kit' )
 		);
 	}
 
 	public function field_frontend_css(): void {
-		$checked = (bool) $this->settings->get( 'enable_frontend_css', true );
-		printf(
-			'<label><input type="checkbox" name="%1$s[enable_frontend_css]" value="1" %2$s /> %3$s</label>',
-			esc_attr( MhdkPocSettingsModel::OPTION_KEY ),
-			checked( $checked, true, false ),
-			esc_html__( 'Load MHDK-POC frontend styles on public pages', AdminMenu::TEXT_DOMAIN )
+		$key = MhdkPocSettingsModel::OPTION_KEY;
+		SettingsFieldRenderer::checkbox(
+			$key . '[enable_frontend_css]',
+			(bool) $this->settings->get( 'enable_frontend_css', true ),
+			__( 'Load MHDK-POC frontend styles on public pages', AdminMenu::TEXT_DOMAIN )
 		);
 	}
 }

@@ -70,6 +70,37 @@ Living reference for all current and future **core** features:
 
 Enable/disable modules under **MHDK Settings → Modules** (`mhdk_module_settings` option).
 
+## Admin UI
+
+MHDK admin pages follow WordPress core markup — no custom admin CSS framework.
+
+### Settings pages (General Settings pattern)
+
+Use the shared partial `Core/Views/admin/partials/settings-page.php`:
+
+- `div.wrap` → `h1` (`get_admin_page_title()`) → `settings_errors()` → form `action="options.php"`
+- `settings_fields( $option_group )` must match `register_setting()` group
+- `do_settings_sections( $page_slug )` renders `form-table` rows from field callbacks
+- `submit_button()` at the bottom
+
+Field callbacks should use `Core\Admin\SettingsFieldRenderer` (`regular-text`, `large-text`, `small-text`, `description` paragraphs). Register fields in the presenter via `add_settings_section()` / `add_settings_field()`.
+
+### List pages (Posts list pattern)
+
+- `h1.wp-heading-inline`, optional `a.page-title-action`, `hr.wp-header-end`
+- `settings_errors()` after save on option pages
+- `table.wp-list-table.widefat.fixed.striped` or `WP_List_Table` subclass (see `Core/Admin/ModulesListTable.php`)
+
+### Meta boxes (post editor pattern)
+
+Use `table.form-table` with `th scope="row"` / `td`, core input classes (`regular-text`, `widefat`, `large-text`).
+
+### Rules
+
+- Use `div.wrap` only — avoid custom wrapper classes unless a JS hook requires an ID
+- Enqueue admin JS via `admin_enqueue_scripts`; no inline scripts in views
+- Avoid custom admin CSS unless core classes cannot express the layout
+
 ## Composer
 
 ```bash

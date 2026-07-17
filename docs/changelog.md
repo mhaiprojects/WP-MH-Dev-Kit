@@ -67,3 +67,13 @@ All notable requests and project changes.
 - **MHDK Settings → Modules** page to enable/disable modules at runtime
 - Features moved to `src/Modules/{Module}/Features/`; namespaces updated
 - `ModuleAdminContributorInterface` replaces `FeatureAdminContributorInterface`
+
+### WP Admin UI alignment (v0.6.1)
+
+- Shared Settings API shell partial (`Core/Views/admin/partials/settings-page.php`)
+- MHDK-POC settings: fixed `settings_fields()` group, field descriptions, removed custom admin CSS
+- Order Menu settings: migrated to Settings API field callbacks; shortcode generator JS enqueued
+- Modules page: `WP_List_Table` subclass, `wp-heading-inline`, `settings_errors()`
+- Content hubs and settings dashboard: core list/header markup; removed `mhdk-admin` wrapper
+- CPT meta boxes: `form-table` layout matching post editor
+- Added `Core/Admin/SettingsFieldRenderer` helper; updated module `_Template` scaffold
