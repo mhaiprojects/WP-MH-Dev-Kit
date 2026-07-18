@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<phpunit
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:noNamespaceSchemaLocation="vendor/phpunit/phpunit/phpunit.xsd"
+	bootstrap="tests/bootstrap.php"
+	colors="true"
+	executionOrder="depends,defects"
+	failOnRisky="true"
+	failOnWarning="true"
+>
+	<testsuites>
+		<testsuite name="Shared">
+			<directory>tests/Unit/Shared</directory>
+		</testsuite>
+		<testsuite name="Core">
+			<directory>tests/Unit/Core</directory>
+			<directory>tests/Integration/Core</directory>
+		</testsuite>
+		<testsuite name="Commerce">
+			<directory>tests/Unit/Commerce</directory>
+			<directory>tests/Integration/Commerce</directory>
+		</testsuite>
+		<testsuite name="UserTools">
+			<directory>tests/Unit/UserTools</directory>
+			<directory>tests/Integration/UserTools</directory>
+		</testsuite>
+		<testsuite name="ContentTools">
+			<directory>tests/Unit/ContentTools</directory>
+			<directory>tests/Integration/ContentTools</directory>
+		</testsuite>
+		<testsuite name="SiteTools">
+			<directory>tests/Unit/SiteTools</directory>
+			<directory>tests/Integration/SiteTools</directory>
+		</testsuite>
+	</testsuites>
+	<logging>
+		<junit outputFile="../../test-results/mh-dev-kit/junit.xml"/>
+	</logging>
+</phpunit>

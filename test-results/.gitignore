@@ -1,0 +1,2 @@
+# Ignore full PHPUnit console logs (regenerate via ./scripts/test-mh-dev-kit.sh)
+**/output.log

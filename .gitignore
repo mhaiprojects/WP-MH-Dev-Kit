@@ -13,6 +13,10 @@
 !/scripts/
 !/scripts/**
 
+# Test results (SUMMARY, junit, per-module reports; logs gitignored under test-results/)
+!/test-results/
+!/test-results/**
+
 # DDev config (minimal — no generated local state)
 !/.ddev/
 /.ddev/*
