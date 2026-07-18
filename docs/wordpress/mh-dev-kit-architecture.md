@@ -12,7 +12,8 @@ wp-content/plugins/mh-dev-kit/
   src/
     Core/                # Plugin bootstrap, ModuleLoader, ViewRenderer, global admin shell
     Modules/
-      Core/              # Core module — MHDK-POC reference + future platform features
+      Core/              # Core module — MHDK-POC reference only
+      SiteTools/         # Site Tools module — admin guard, map distance
       Commerce/          # Commerce module — WooCommerce features
       _Template/         # Copy scaffold for new modules
     Shared/              # AssetRegistrar and cross-module utilities
@@ -47,6 +48,10 @@ wp-content/plugins/mh-dev-kit/
 | Plugin | Modules (enable/disable) | `mhdk-settings-modules` |
 | Core module | MHDK-POC settings | `mhdk-settings-poc` |
 | Core module | Content hub + CPTs | `mhdk-core-content` |
+| Site Tools module | Restrict Origin settings | `mhdk-settings-restrict-origin` |
+| Site Tools module | Map Distance settings | `mhdk-settings-map-distance` |
+| User Tools module | User Tools hub | `mhdk-user-tools` |
+| Content Tools module | Content Tools hub | `mhdk-content-tools` |
 | Commerce module | Order Menu settings | `mhdk-settings-order-menu` |
 | Commerce module | Commerce content + Saved Menus CPT | `mhdk-commerce-content` |
 
@@ -54,7 +59,9 @@ Modules register subpages via `ModuleAdminContributorInterface::register_admin()
 
 ## Core module (MHDK-POC)
 
-Living reference for all current and future **core** features:
+Living reference for the **MHDK-POC** feature only. Other v0.7.0 features live in Site Tools, User Tools, or Content Tools modules.
+
+MHDK-POC demonstrates:
 
 - Settings API subpage pattern
 - CPT registration (`mhdk_hosp_menu`, `mhdk_web_link`)
@@ -66,7 +73,10 @@ Living reference for all current and future **core** features:
 | Module ID | Features | Requirements |
 |-----------|----------|--------------|
 | `core` | `MhdkPocFeature` | WordPress |
+| `site-tools` | `BackendRestrictOriginFeature`, `MapDistanceFeature` | WordPress |
 | `commerce` | `OrderMenuFeature` | WooCommerce |
+| `user-tools` | `QrCodeFeature`, `VCardFeature`, `ShortlinksFeature`, `FamilyTreeFeature` | WordPress |
+| `content-tools` | `ChildrenPagesFeature`, `MarkdownEditorFeature`, `LocalAdPageFeature` | WordPress |
 
 Enable/disable modules under **MHDK Settings → Modules** (`mhdk_module_settings` option).
 

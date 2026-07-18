@@ -1,0 +1,22 @@
+.mhdk-family-tree-app {
+	margin: 1.5em 0;
+	padding: 1em;
+	border: 1px solid #dcdcde;
+	border-radius: 6px;
+}
+
+.mhdk-family-tree-root,
+.mhdk-family-tree-root ul {
+	list-style: none;
+	padding-left: 1.25em;
+	margin: 0.5em 0;
+}
+
+.mhdk-tree-node-name {
+	font-weight: 600;
+	margin-right: 0.5em;
+}
+
+.mhdk-family-tree-ui .button-link {
+	margin-left: 0.25em;
+}

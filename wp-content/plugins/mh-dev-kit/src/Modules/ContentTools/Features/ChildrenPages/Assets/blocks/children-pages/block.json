@@ -1,0 +1,32 @@
+{
+	"$schema": "https://schemas.wp.org/trunk/block.json",
+	"apiVersion": 3,
+	"name": "mh-dev-kit/children-pages",
+	"title": "MH Children Pages",
+	"category": "mhdk",
+	"icon": "list-view",
+	"description": "List child pages of the current page or a specified parent.",
+	"textdomain": "mh-dev-kit",
+	"attributes": {
+		"parentId": {
+			"type": "number",
+			"default": 0
+		},
+		"orderby": {
+			"type": "string",
+			"default": "menu_order"
+		},
+		"order": {
+			"type": "string",
+			"default": "ASC"
+		},
+		"limit": {
+			"type": "number",
+			"default": 50
+		}
+	},
+	"supports": {
+		"html": false
+	},
+	"render": "file:./render.php"
+}

@@ -1,0 +1,26 @@
+.mhdk-vcard {
+	border: 1px solid #dcdcde;
+	border-radius: 6px;
+	padding: 1.25em;
+	max-width: 28rem;
+	margin: 1.5em 0;
+}
+
+.mhdk-vcard-name {
+	margin: 0 0 0.25em;
+}
+
+.mhdk-vcard-subtitle {
+	color: #646970;
+	margin: 0 0 1em;
+}
+
+.mhdk-vcard-details {
+	list-style: none;
+	padding: 0;
+	margin: 0 0 1em;
+}
+
+.mhdk-vcard-details li {
+	margin-bottom: 0.35em;
+}

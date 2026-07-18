@@ -1,0 +1,39 @@
+.mhdk-local-ad-body {
+	margin: 0;
+	font-family: system-ui, -apple-system, sans-serif;
+	background: #fff;
+	color: #1d2327;
+}
+
+.mhdk-local-ad {
+	max-width: 48rem;
+	margin: 0 auto;
+	padding: 2rem 1rem 3rem;
+}
+
+.mhdk-local-ad-location {
+	color: #646970;
+	text-transform: uppercase;
+	letter-spacing: 0.04em;
+	font-size: 0.85rem;
+}
+
+.mhdk-local-ad-headline {
+	margin: 0.25em 0 0.75em;
+	font-size: 2rem;
+}
+
+.mhdk-local-ad-image {
+	margin: 1.5em 0;
+}
+
+.mhdk-local-ad-image img {
+	max-width: 100%;
+	height: auto;
+	border-radius: 6px;
+}
+
+.mhdk-local-ad-body-text,
+.mhdk-local-ad-content {
+	line-height: 1.65;
+}

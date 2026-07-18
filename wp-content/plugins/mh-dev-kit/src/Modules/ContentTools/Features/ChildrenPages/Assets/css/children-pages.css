@@ -1,0 +1,14 @@
+.mhdk-children-pages {
+	list-style: disc;
+	padding-left: 1.5em;
+	margin: 1em 0;
+}
+
+.mhdk-children-pages li {
+	margin-bottom: 0.35em;
+}
+
+.mhdk-children-pages-empty {
+	color: #646970;
+	font-style: italic;
+}

@@ -1,0 +1,30 @@
+.mhdk-markdown,
+.mhdk-markdown-preview {
+	line-height: 1.6;
+}
+
+.mhdk-markdown h1,
+.mhdk-markdown-preview h1 {
+	font-size: 1.75em;
+	margin-top: 0;
+}
+
+.mhdk-markdown pre,
+.mhdk-markdown-preview pre {
+	background: #f6f7f7;
+	padding: 1em;
+	overflow-x: auto;
+	border-radius: 4px;
+}
+
+.mhdk-markdown-editor textarea {
+	width: 100%;
+	font-family: monospace;
+}
+
+.mhdk-markdown-preview {
+	margin-top: 1em;
+	padding: 1em;
+	border: 1px solid #dcdcde;
+	border-radius: 4px;
+}

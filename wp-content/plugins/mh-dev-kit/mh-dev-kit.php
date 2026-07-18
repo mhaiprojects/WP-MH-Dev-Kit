@@ -2,7 +2,7 @@
 /**
  * Plugin Name:       MH Dev Kit
  * Description:       Monolithic WordPress development plugin with modular features grouped into modules.
- * Version:           0.6.1
+ * Version:           0.7.0
  * Requires at least: 6.4
  * Requires PHP:      8.1
  * Author:            MH
@@ -17,7 +17,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-define( 'MH_DEV_KIT_VERSION', '0.6.1' );
+define( 'MH_DEV_KIT_VERSION', '0.7.0' );
 define( 'MH_DEV_KIT_FILE', __FILE__ );
 define( 'MH_DEV_KIT_PATH', plugin_dir_path( __FILE__ ) );
 define( 'MH_DEV_KIT_URL', plugin_dir_url( __FILE__ ) );

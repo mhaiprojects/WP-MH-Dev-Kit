@@ -77,3 +77,26 @@ All notable requests and project changes.
 - Content hubs and settings dashboard: core list/header markup; removed `mhdk-admin` wrapper
 - CPT meta boxes: `form-table` layout matching post editor
 - Added `Core/Admin/SettingsFieldRenderer` helper; updated module `_Template` scaffold
+
+### Platform features batch (v0.7.0)
+
+Nine new features across Site Tools, User Tools, and Content Tools modules (plugin v0.7.0). Core module retains only the MHDK-POC reference.
+
+**Site Tools module** (new)
+- Backend Restrict Origin — Referer/Origin admin guard with settings toggle
+- Map Distance — `[mhdk_map_distance]` shortcode, haversine geolocation, demo page
+
+**Content Tools module** (new)
+- Children Pages — Gutenberg block + `[mhdk_children_pages]` shortcode
+- Markdown Editor — dynamic Gutenberg block (marked.js CDN)
+- My Local Ad Page — CPT, `/local/{country}/{state}/{suburb}-{postcode}/` URLs, REST CRUD + upload, Shepparton VIC seed
+
+**User Tools module** (new)
+- QR Code Generator — user-scoped CPT, `[mhdk_qr_code]` shortcode
+- vCard Generator — user CPT, `/vcard/{id}/` download, `[mhdk_vcard]` shortcode
+- Shortlinks Manager — Linktree-style pages at `/l/{slug}/`
+- Family Tree Builder — Vue.js app, `[mhdk_family_tree]`, REST save endpoint
+
+**Recategorization:** v0.7.0 features initially landed in Core; moved to Site Tools, User Tools, and Content Tools so Core contains only `MhdkPocFeature`.
+
+Shared helpers: `BlockCategoryHelper`, `UserScopedCptHelper`, settings partial. Per-feature README under each feature folder. Run `./scripts/composer-mh-dev-kit.sh dump-autoload -o` after deploy; flush permalinks for new rewrite rules.

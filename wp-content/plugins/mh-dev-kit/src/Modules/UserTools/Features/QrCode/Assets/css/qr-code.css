@@ -1,0 +1,13 @@
+.mhdk-qr-code {
+	text-align: center;
+	margin: 1.5em 0;
+}
+
+.mhdk-qr-code-canvas {
+	display: inline-block;
+}
+
+.mhdk-qr-code-canvas img {
+	display: block;
+	margin: 0 auto;
+}

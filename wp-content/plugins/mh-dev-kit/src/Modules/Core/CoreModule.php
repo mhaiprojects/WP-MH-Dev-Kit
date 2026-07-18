@@ -1,6 +1,6 @@
 <?php
 /**
- * Core module — reference PoC and platform features.
+ * Core module — MHDK-POC reference only.
  *
  * @package MH\DevKit\Modules\Core
  */
@@ -34,7 +34,7 @@ final class CoreModule implements ModuleInterface, ModuleAdminContributorInterfa
 	}
 
 	public static function description(): string {
-		return __( 'Reference PoC and platform features: settings patterns, CPTs, blocks, and content admin.', 'mh-dev-kit' );
+		return __( 'MHDK-POC reference: settings patterns, CPTs, blocks, and content admin.', 'mh-dev-kit' );
 	}
 
 	public static function features(): array {
@@ -48,8 +48,9 @@ final class CoreModule implements ModuleInterface, ModuleAdminContributorInterfa
 	}
 
 	public function register(): void {
-		$this->settings       = new MhdkPocSettingsModel();
-		$this->poc_settings   = new PocSettingsPresenter( $this->settings );
+		$this->settings     = new MhdkPocSettingsModel();
+		$this->poc_settings = new PocSettingsPresenter( $this->settings );
+
 		$this->poc_settings->register();
 
 		foreach ( self::features() as $feature_class ) {
@@ -58,14 +59,14 @@ final class CoreModule implements ModuleInterface, ModuleAdminContributorInterfa
 	}
 
 	public function register_admin( AdminMenuRegistrar $registrar ): void {
-		$settings_presenter = $this->poc_settings;
+		$poc_settings = $this->poc_settings;
 
 		$registrar->add_submenu(
 			MhdkPocSettingsModel::SETTINGS_SLUG,
 			__( 'MHDK-POC', AdminMenu::TEXT_DOMAIN ),
 			__( 'MHDK-POC Settings', AdminMenu::TEXT_DOMAIN ),
-			static function () use ( $settings_presenter ): void {
-				$settings_presenter->render_settings();
+			static function () use ( $poc_settings ): void {
+				$poc_settings->render_settings();
 			}
 		);
 
