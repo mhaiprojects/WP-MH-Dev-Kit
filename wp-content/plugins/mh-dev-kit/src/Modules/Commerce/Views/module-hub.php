@@ -31,6 +31,10 @@ if ( ! defined( 'ABSPATH' ) ) {
 				<td><a href="<?php echo esc_url( admin_url( 'admin.php?page=mhdk-settings-store-locator' ) ); ?>"><?php esc_html_e( 'Settings', 'mh-dev-kit' ); ?></a></td>
 			</tr>
 			<tr>
+				<td class="column-primary"><strong><?php esc_html_e( 'Inventory Management', 'mh-dev-kit' ); ?></strong></td>
+				<td><a href="<?php echo esc_url( admin_url( 'admin.php?page=mhdk-settings-inventory' ) ); ?>"><?php esc_html_e( 'Manage', 'mh-dev-kit' ); ?></a></td>
+			</tr>
+			<tr>
 				<td class="column-primary"><strong><?php esc_html_e( 'Commerce Content', 'mh-dev-kit' ); ?></strong></td>
 				<td><a href="<?php echo esc_url( admin_url( 'admin.php?page=mhdk-commerce-content' ) ); ?>"><?php esc_html_e( 'View content types', 'mh-dev-kit' ); ?></a></td>
 			</tr>

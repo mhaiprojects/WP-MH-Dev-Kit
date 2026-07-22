@@ -15,9 +15,16 @@ use MH\DevKit\Core\Admin\ModuleAdminContributorInterface;
 use MH\DevKit\Core\ModuleInterface;
 use MH\DevKit\Core\ModuleRequirements;
 use MH\DevKit\Core\ViewRenderer;
+use MH\DevKit\Modules\Commerce\Features\InventoryManagement\InventoryManagementFeature;
+use MH\DevKit\Modules\Commerce\Features\InventoryManagement\Models\InventoryModel;
+use MH\DevKit\Modules\Commerce\Features\InventoryManagement\Models\InventorySettingsModel;
+use MH\DevKit\Modules\Commerce\Features\InventoryManagement\Presenters\InventoryAdminPresenter;
 use MH\DevKit\Modules\Commerce\Features\OrderMenu\Models\OrderMenuSettingsModel;
 use MH\DevKit\Modules\Commerce\Features\OrderMenu\OrderMenuFeature;
 use MH\DevKit\Modules\Commerce\Features\OrderMenu\Presenters\OrderMenuAdminPresenter;
+use MH\DevKit\Modules\Commerce\Features\InventoryManagement\InventoryManagementFeature;
+use MH\DevKit\Modules\Commerce\Features\InventoryManagement\Models\InventorySettingsModel;
+use MH\DevKit\Modules\Commerce\Features\InventoryManagement\Presenters\InventoryAdminPresenter;
 use MH\DevKit\Modules\Commerce\Features\StoreLocator\Models\StoreLocatorModel;
 use MH\DevKit\Modules\Commerce\Features\StoreLocator\Models\StoreLocatorSettingsModel;
 use MH\DevKit\Modules\Commerce\Features\StoreLocator\Presenters\StoreLocatorSettingsPresenter;
@@ -28,6 +35,8 @@ final class CommerceModule implements ModuleInterface, ModuleAdminContributorInt
 	private OrderMenuAdminPresenter $admin;
 
 	private StoreLocatorSettingsPresenter $store_locator_settings;
+
+	private InventoryAdminPresenter $inventory_admin;
 
 	public static function id(): string {
 		return 'commerce';
@@ -45,6 +54,7 @@ final class CommerceModule implements ModuleInterface, ModuleAdminContributorInt
 		return array(
 			OrderMenuFeature::class,
 			StoreLocatorFeature::class,
+			InventoryManagementFeature::class,
 		);
 	}
 
@@ -58,9 +68,14 @@ final class CommerceModule implements ModuleInterface, ModuleAdminContributorInt
 			new StoreLocatorSettingsModel(),
 			new StoreLocatorModel()
 		);
+		$this->inventory_admin          = new InventoryAdminPresenter(
+			new InventoryModel(),
+			new InventorySettingsModel()
+		);
 
 		$this->admin->register();
 		$this->store_locator_settings->register();
+		$this->inventory_admin->register();
 
 		foreach ( self::features() as $feature_class ) {
 			( new $feature_class() )->register();
@@ -70,6 +85,7 @@ final class CommerceModule implements ModuleInterface, ModuleAdminContributorInt
 	public function register_admin( AdminMenuRegistrar $registrar ): void {
 		$admin                  = $this->admin;
 		$store_locator_settings = $this->store_locator_settings;
+		$inventory_admin        = $this->inventory_admin;
 
 		$registrar->add_module_menu(
 			self::id(),
@@ -93,6 +109,16 @@ final class CommerceModule implements ModuleInterface, ModuleAdminContributorInt
 			static function () use ( $store_locator_settings ): void {
 				$store_locator_settings->render_settings();
 			}
+		);
+
+		$registrar->add_module_submenu(
+			InventorySettingsModel::SETTINGS_SLUG,
+			__( 'Inventory', AdminMenu::TEXT_DOMAIN ),
+			__( 'Inventory Management', AdminMenu::TEXT_DOMAIN ),
+			static function () use ( $inventory_admin ): void {
+				$inventory_admin->render_settings();
+			},
+			'manage_woocommerce'
 		);
 
 		$registrar->add_module_submenu(
