@@ -10,6 +10,7 @@ Principle: **use Divi/WP features first; custom PHP/CSS only when no native opti
 | `wp-content/mu-plugins/adamat-divi-hero.php` — regex sync of `background_image` on featured-image change | **Dynamic Content → Featured Image** on section Background → Image | **Removed** MU plugin |
 | `sync_hero_background_from_featured_image()` + `register_hero_sync_hooks()` | Same | **Removed** from `AdamatDiviLayouts.php` |
 | Static hero URL in `hero_photo_bg( $media_key )` | `@ET-DC@…post_featured_image…@` token + page Featured Image | **Replaced** with `hero_photo_bg_dynamic()` |
+| Card CSS via `wp_update_custom_css_post()` (WP Customizer Additional CSS) | **Divi → Theme Options → General → Custom CSS** (`divi_custom_css`) | **Moved** to Divi Theme Options field |
 
 Hero sections now use Divi’s native dynamic featured image. The seed script still calls `set_page_featured_image()` so each page gets the correct initial image from the media catalog.
 
@@ -29,7 +30,7 @@ Hero sections now use Divi’s native dynamic featured image. The seed script st
 
 | Code | Why custom |
 |------|------------|
-| `apply_card_styles()` / `.adamat-card` CSS | Divi Blurb has no 16:9 image crop + flex equal-height card body in one setting; row `make_equal` alone does not fix image aspect ratio |
+| `apply_card_styles()` / `.adamat-card` CSS | Divi Blurb has no 16:9 image crop + flex equal-height card body in one setting; row `make_equal` alone does not fix image aspect ratio | CSS lives in **Divi → Theme Options → General → Custom CSS** (`divi_custom_css`) |
 | `AdamatDiviLayouts` shortcode builders | Needed to programmatically seed layouts via WP-CLI; Divi has no “import JSON layout” in CLI without equivalent shortcodes |
 | `AdamatMediaAssets` sideload | One-time seed of royalty-free images into Media Library |
 | Inline brand colours in Text module HTML | Could move to Divi Theme Options / Global Colors over time; low priority for seed script |
@@ -42,7 +43,6 @@ Hero sections now use Divi’s native dynamic featured image. The seed script st
 | **Theme Builder** header/footer templates | Better for production; seed script would need Theme Builder API or manual export |
 | **Divi Global Colors** for `#0f2744`, `#0ea5e9` | Cleaner than inline styles; requires Theme Options or Divi 5 variables |
 | **Post Title module** with `featured_placement="background"` | Only applies to post title module, not free-form hero copy — not a drop-in for adamat heroes |
-| **Blurb equal height via custom CSS only in Divi Theme Options** | Could move `apply_card_styles()` CSS to Divi → Theme Options → Custom CSS and drop PHP injection |
 | **Single Global Layout** for entire services block | Already partially done; could collapse three global sections into one library item |
 
 ## Parallax + gradient note

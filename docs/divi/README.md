@@ -23,7 +23,7 @@ Before adding PHP, MU plugins, or custom CSS in `AdamatDiviLayouts.php`:
 | [global-modules.html](./global-modules.html) | [ET docs](https://www.elegantthemes.com/documentation/divi/global-modules/) | Shared service card rows |
 | [scroll-effects.html](./scroll-effects.html) | [ET docs](https://www.elegantthemes.com/documentation/divi/scroll-effects/) | Hero parallax / vertical motion |
 | [animation.html](./animation.html) | [ET docs](https://www.elegantthemes.com/documentation/divi/animation/) | Fade / slide on text and cards |
-| [adamat-refactor-audit.md](./adamat-refactor-audit.md) | Project | What we kept vs replaced with Divi built-ins |
+| [theme-options.html](./theme-options.html) | [ET docs](https://www.elegantthemes.com/documentation/divi/theme-options/) | Custom CSS field, brand colours |
 
 ## Dynamic Content shortcode token
 
@@ -43,11 +43,15 @@ et_builder_serialize_dynamic_content( true, 'post_featured_image', array( 'enabl
 
 Set the page **Featured Image** in WordPress; Divi resolves the hero background at render time — no sync hooks required.
 
+## Custom CSS location
+
+Service card CSS (`.adamat-card`) is written to **Divi → Theme Options → General → Custom CSS** via the `divi_custom_css` option when you run the adamat seed script. Edit it there in wp-admin.
+
 ## Refreshing these files
 
 ```bash
 cd docs/divi
-for slug in divi-dynamic-content-options sections rows background-options global-modules scroll-effects animation blurb; do
+for slug in divi-dynamic-content-options sections rows background-options global-modules scroll-effects animation blurb theme-options; do
   curl -sL "https://www.elegantthemes.com/documentation/divi/${slug}/" -o "${slug}.html"
 done
 ```

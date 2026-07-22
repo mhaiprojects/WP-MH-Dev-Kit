@@ -94,15 +94,16 @@ final class AdamatDiviLayouts {
 
 	/**
 	 * Uniform card image sizing and equal-height card rows (Divi equal columns + flex fill).
+	 * Stored in Divi → Theme Options → General → Custom CSS (`divi_custom_css`).
 	 */
 	private static function apply_card_styles(): void {
-		if ( ! function_exists( 'wp_get_custom_css' ) || ! function_exists( 'wp_update_custom_css_post' ) ) {
+		if ( ! function_exists( 'et_get_option' ) || ! function_exists( 'et_update_option' ) ) {
 			return;
 		}
 
-		$marker = '/* adamat-card-styles */';
-		$css    = self::card_styles_css();
-		$existing = wp_get_custom_css();
+		$marker   = '/* adamat-card-styles */';
+		$css      = self::card_styles_css();
+		$existing = (string) et_get_option( 'divi_custom_css', '' );
 
 		if ( str_contains( $existing, $marker ) ) {
 			$existing = preg_replace(
@@ -114,8 +115,35 @@ final class AdamatDiviLayouts {
 		}
 
 		$combined = trim( $existing . "\n\n" . $css );
+		et_update_option( 'divi_custom_css', $combined );
 
-		wp_update_custom_css_post( $combined );
+		self::remove_card_styles_from_wp_customizer();
+	}
+
+	/** Remove legacy adamat card CSS from WP Customizer Additional CSS (now in Divi Theme Options). */
+	private static function remove_card_styles_from_wp_customizer(): void {
+		if ( ! function_exists( 'wp_get_custom_css' ) || ! function_exists( 'wp_update_custom_css_post' ) ) {
+			return;
+		}
+
+		$marker   = '/* adamat-card-styles */';
+		$existing = wp_get_custom_css();
+
+		if ( ! str_contains( $existing, $marker ) ) {
+			return;
+		}
+
+		$cleaned = preg_replace(
+			'/' . preg_quote( $marker, '/' ) . '[\s\S]*?' . preg_quote( $marker, '/' ) . '-end/u',
+			'',
+			$existing
+		);
+
+		if ( ! is_string( $cleaned ) ) {
+			return;
+		}
+
+		wp_update_custom_css_post( trim( $cleaned ) );
 	}
 
 	private static function card_styles_css(): string {
