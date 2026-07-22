@@ -9,6 +9,8 @@ declare(strict_types=1);
 
 namespace MH\DevKit\Modules\SiteTools\Features\MapDistance\Models;
 
+use MH\DevKit\Shared\DistanceCalculator;
+
 final class MapDistanceSettingsModel {
 
 	public const OPTION_KEY = 'mhdk_map_distance_settings';
@@ -61,18 +63,7 @@ final class MapDistanceSettingsModel {
 	 * Haversine distance in metres.
 	 */
 	public function distance_metres( float $lat1, float $lng1, float $lat2, float $lng2 ): float {
-		$earth_radius = 6371000.0;
-		$lat1_rad     = deg2rad( $lat1 );
-		$lat2_rad     = deg2rad( $lat2 );
-		$delta_lat    = deg2rad( $lat2 - $lat1 );
-		$delta_lng    = deg2rad( $lng2 - $lng1 );
-
-		$a = sin( $delta_lat / 2 ) ** 2
-			+ cos( $lat1_rad ) * cos( $lat2_rad ) * sin( $delta_lng / 2 ) ** 2;
-
-		$c = 2 * atan2( sqrt( $a ), sqrt( 1 - $a ) );
-
-		return $earth_radius * $c;
+		return DistanceCalculator::metres( $lat1, $lng1, $lat2, $lng2 );
 	}
 
 	/**

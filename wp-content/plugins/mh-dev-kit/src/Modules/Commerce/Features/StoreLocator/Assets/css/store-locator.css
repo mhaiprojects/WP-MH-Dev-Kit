@@ -1,0 +1,54 @@
+.mhdk-store-locator {
+	max-width: 720px;
+}
+
+.mhdk-store-locator-toolbar {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: center;
+	gap: 12px;
+	margin-bottom: 16px;
+}
+
+.mhdk-store-locator-list {
+	list-style: none;
+	margin: 0;
+	padding: 0;
+	display: grid;
+	gap: 12px;
+}
+
+.mhdk-store-locator-item {
+	border: 1px solid #dcdcde;
+	border-radius: 6px;
+	padding: 16px;
+	background: #fff;
+}
+
+.mhdk-store-locator-item.is-selected {
+	border-color: #2271b1;
+	box-shadow: 0 0 0 1px #2271b1;
+}
+
+.mhdk-store-locator-item-head {
+	display: flex;
+	justify-content: space-between;
+	gap: 12px;
+	margin-bottom: 8px;
+}
+
+.mhdk-store-locator-distance {
+	color: #646970;
+	font-size: 0.95em;
+}
+
+.mhdk-store-locator-address,
+.mhdk-store-locator-phone,
+.mhdk-store-locator-hours {
+	margin: 0 0 8px;
+}
+
+.mhdk-checkout-distance {
+	margin-top: 8px;
+	color: #646970;
+}
