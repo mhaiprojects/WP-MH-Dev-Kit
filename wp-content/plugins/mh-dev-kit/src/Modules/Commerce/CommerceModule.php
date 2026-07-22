@@ -22,9 +22,6 @@ use MH\DevKit\Modules\Commerce\Features\InventoryManagement\Presenters\Inventory
 use MH\DevKit\Modules\Commerce\Features\OrderMenu\Models\OrderMenuSettingsModel;
 use MH\DevKit\Modules\Commerce\Features\OrderMenu\OrderMenuFeature;
 use MH\DevKit\Modules\Commerce\Features\OrderMenu\Presenters\OrderMenuAdminPresenter;
-use MH\DevKit\Modules\Commerce\Features\InventoryManagement\InventoryManagementFeature;
-use MH\DevKit\Modules\Commerce\Features\InventoryManagement\Models\InventorySettingsModel;
-use MH\DevKit\Modules\Commerce\Features\InventoryManagement\Presenters\InventoryAdminPresenter;
 use MH\DevKit\Modules\Commerce\Features\StoreLocator\Models\StoreLocatorModel;
 use MH\DevKit\Modules\Commerce\Features\StoreLocator\Models\StoreLocatorSettingsModel;
 use MH\DevKit\Modules\Commerce\Features\StoreLocator\Presenters\StoreLocatorSettingsPresenter;
