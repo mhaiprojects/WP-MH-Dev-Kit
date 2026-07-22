@@ -13,4 +13,5 @@ return array(
 	MH\DevKit\Modules\SiteTools\SiteToolsModule::class,
 	MH\DevKit\Modules\UserTools\UserToolsModule::class,
 	MH\DevKit\Modules\ContentTools\ContentToolsModule::class,
+	MH\DevKit\Modules\Integration\IntegrationModule::class,
 );

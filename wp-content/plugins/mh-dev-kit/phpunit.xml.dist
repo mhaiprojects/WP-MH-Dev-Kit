@@ -32,6 +32,10 @@
 			<directory>tests/Unit/SiteTools</directory>
 			<directory>tests/Integration/SiteTools</directory>
 		</testsuite>
+		<testsuite name="Integration">
+			<directory>tests/Unit/Integration</directory>
+			<directory>tests/Integration/Integration</directory>
+		</testsuite>
 	</testsuites>
 	<logging>
 		<junit outputFile="../../test-results/mh-dev-kit/junit.xml"/>

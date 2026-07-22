@@ -1,0 +1,283 @@
+<?php
+/**
+ * Third-party API connection records and execution log.
+ *
+ * @package MH\DevKit\Modules\Integration\Features\ApiMiddleware\Models
+ */
+
+declare(strict_types=1);
+
+namespace MH\DevKit\Modules\Integration\Features\ApiMiddleware\Models;
+
+final class ApiMiddlewareModel {
+
+	public const CONNECTIONS_OPTION = 'mhdk_api_middleware_connections';
+
+	public const LOG_OPTION = 'mhdk_api_middleware_log';
+
+	public const CRON_HOOK = 'mhdk_api_middleware_run_scheduled';
+
+	/**
+	 * @return array<int, array<string, mixed>>
+	 */
+	public function get_connections(): array {
+		$stored = get_option( self::CONNECTIONS_OPTION, array() );
+
+		return is_array( $stored ) ? $this->normalize_connections( $stored ) : array();
+	}
+
+	/**
+	 * @return array<string, mixed>|null
+	 */
+	public function get_connection( string $id ): ?array {
+		foreach ( $this->get_connections() as $connection ) {
+			if ( $connection['id'] === $id ) {
+				return $connection;
+			}
+		}
+
+		return null;
+	}
+
+	/**
+	 * @param array<string, mixed> $connection Connection payload.
+	 */
+	public function save_connection( array $connection ): void {
+		$connections = $this->get_connections();
+		$normalized  = $this->normalize_connection( $connection );
+		$found       = false;
+
+		foreach ( $connections as $index => $existing ) {
+			if ( $existing['id'] === $normalized['id'] ) {
+				$connections[ $index ] = $normalized;
+				$found                 = true;
+				break;
+			}
+		}
+
+		if ( ! $found ) {
+			$connections[] = $normalized;
+		}
+
+		update_option( self::CONNECTIONS_OPTION, $connections, false );
+	}
+
+	public function delete_connection( string $id ): void {
+		$connections = array_values(
+			array_filter(
+				$this->get_connections(),
+				static fn( array $connection ): bool => $connection['id'] !== $id
+			)
+		);
+
+		update_option( self::CONNECTIONS_OPTION, $connections, false );
+	}
+
+	/**
+	 * @return array<string, mixed>
+	 */
+	public function run_connection( string $id ): array {
+		$connection = $this->get_connection( $id );
+
+		if ( null === $connection ) {
+			return array(
+				'success' => false,
+				'message' => 'Connection not found.',
+			);
+		}
+
+		$url     = $this->build_url( $connection );
+		$headers = $this->build_headers( $connection );
+		$method  = strtoupper( (string) $connection['method'] );
+
+		$args = array(
+			'method'  => $method,
+			'headers' => $headers,
+			'timeout' => 20,
+		);
+
+		$response = 'POST' === $method
+			? wp_remote_post( $url, $args )
+			: wp_remote_get( $url, $args );
+
+		if ( is_wp_error( $response ) ) {
+			$result = array(
+				'success' => false,
+				'message' => $response->get_error_message(),
+				'status'  => 0,
+			);
+			$this->persist_result( $connection, $result, '' );
+			return $result;
+		}
+
+		$status = (int) wp_remote_retrieve_response_code( $response );
+		$body   = (string) wp_remote_retrieve_body( $response );
+		$ok     = $status >= 200 && $status < 300;
+
+		$result = array(
+			'success' => $ok,
+			'message' => $ok ? 'OK' : 'HTTP ' . $status,
+			'status'  => $status,
+		);
+
+		$this->persist_result( $connection, $result, $body );
+
+		return $result;
+	}
+
+	/**
+	 * @return array<int, array<string, mixed>>
+	 */
+	public function get_log( int $limit = 20 ): array {
+		$stored = get_option( self::LOG_OPTION, array() );
+
+		if ( ! is_array( $stored ) ) {
+			return array();
+		}
+
+		return array_slice( $stored, 0, max( 1, $limit ) );
+	}
+
+	public function seed_demo_connection_if_empty(): void {
+		if ( ! empty( $this->get_connections() ) ) {
+			return;
+		}
+
+		$this->save_connection(
+			array(
+				'id'           => 'jsonplaceholder-posts',
+				'name'         => 'JSONPlaceholder Posts (POC)',
+				'base_url'     => 'https://jsonplaceholder.typicode.com',
+				'endpoint'     => '/posts/1',
+				'method'       => 'GET',
+				'auth_type'    => 'none',
+				'auth_header'  => 'Authorization',
+				'auth_value'   => '',
+				'schedule'     => 'daily',
+				'target_type'  => 'option',
+				'target_key'   => 'mhdk_api_demo_posts',
+				'enabled'      => true,
+			)
+		);
+	}
+
+	/**
+	 * @param array<int, array<string, mixed>> $connections Raw connections.
+	 * @return array<int, array<string, mixed>>
+	 */
+	private function normalize_connections( array $connections ): array {
+		$clean = array();
+
+		foreach ( $connections as $connection ) {
+			if ( ! is_array( $connection ) ) {
+				continue;
+			}
+
+			$clean[] = $this->normalize_connection( $connection );
+		}
+
+		return $clean;
+	}
+
+	/**
+	 * @param array<string, mixed> $connection Raw connection.
+	 * @return array<string, mixed>
+	 */
+	private function normalize_connection( array $connection ): array {
+		$id = sanitize_key( (string) ( $connection['id'] ?? uniqid( 'api-', true ) ) );
+
+		return array(
+			'id'          => $id,
+			'name'        => sanitize_text_field( (string) ( $connection['name'] ?? $id ) ),
+			'base_url'    => esc_url_raw( (string) ( $connection['base_url'] ?? '' ) ),
+			'endpoint'    => sanitize_text_field( (string) ( $connection['endpoint'] ?? '/' ) ),
+			'method'      => in_array( strtoupper( (string) ( $connection['method'] ?? 'GET' ) ), array( 'GET', 'POST' ), true )
+				? strtoupper( (string) $connection['method'] )
+				: 'GET',
+			'auth_type'   => in_array( (string) ( $connection['auth_type'] ?? 'none' ), array( 'none', 'bearer', 'basic', 'api_key' ), true )
+				? (string) $connection['auth_type']
+				: 'none',
+			'auth_header' => sanitize_text_field( (string) ( $connection['auth_header'] ?? 'Authorization' ) ),
+			'auth_value'  => sanitize_text_field( (string) ( $connection['auth_value'] ?? '' ) ),
+			'schedule'    => in_array( (string) ( $connection['schedule'] ?? 'manual' ), array( 'manual', 'hourly', 'daily' ), true )
+				? (string) $connection['schedule']
+				: 'manual',
+			'target_type' => in_array( (string) ( $connection['target_type'] ?? 'option' ), array( 'option', 'transient' ), true )
+				? (string) $connection['target_type']
+				: 'option',
+			'target_key'  => sanitize_key( (string) ( $connection['target_key'] ?? 'mhdk_api_data_' . $id ) ),
+			'enabled'     => ! empty( $connection['enabled'] ),
+			'last_run'    => (int) ( $connection['last_run'] ?? 0 ),
+			'last_status' => sanitize_text_field( (string) ( $connection['last_status'] ?? '' ) ),
+		);
+	}
+
+	/**
+	 * @param array<string, mixed> $connection Connection row.
+	 */
+	private function build_url( array $connection ): string {
+		return rtrim( (string) $connection['base_url'], '/' ) . '/' . ltrim( (string) $connection['endpoint'], '/' );
+	}
+
+	/**
+	 * @param array<string, mixed> $connection Connection row.
+	 * @return array<string, string>
+	 */
+	private function build_headers( array $connection ): array {
+		$headers = array(
+			'Accept' => 'application/json',
+		);
+
+		$value = (string) $connection['auth_value'];
+		$type  = (string) $connection['auth_type'];
+		$header = (string) $connection['auth_header'];
+
+		if ( '' === $value || 'none' === $type ) {
+			return $headers;
+		}
+
+		if ( 'bearer' === $type ) {
+			$headers[ $header ?: 'Authorization' ] = 'Bearer ' . $value;
+		} elseif ( 'basic' === $type ) {
+			$headers[ $header ?: 'Authorization' ] = 'Basic ' . base64_encode( $value );
+		} else {
+			$headers[ $header ?: 'X-API-Key' ] = $value;
+		}
+
+		return $headers;
+	}
+
+	/**
+	 * @param array<string, mixed> $connection Connection row.
+	 * @param array<string, mixed> $result Run result.
+	 */
+	private function persist_result( array $connection, array $result, string $body ): void {
+		$connection['last_run']    = time();
+		$connection['last_status'] = ! empty( $result['success'] ) ? 'success' : 'error';
+		$this->save_connection( $connection );
+
+		if ( ! empty( $result['success'] ) && '' !== $body ) {
+			$key = (string) $connection['target_key'];
+
+			if ( 'transient' === $connection['target_type'] ) {
+				set_transient( $key, $body, DAY_IN_SECONDS );
+			} else {
+				update_option( $key, $body, false );
+			}
+		}
+
+		$log = $this->get_log( 50 );
+		array_unshift(
+			$log,
+			array(
+				'connection_id' => (string) $connection['id'],
+				'timestamp'     => time(),
+				'success'       => ! empty( $result['success'] ),
+				'message'       => (string) ( $result['message'] ?? '' ),
+				'status'        => (int) ( $result['status'] ?? 0 ),
+			)
+		);
+
+		update_option( self::LOG_OPTION, array_slice( $log, 0, 50 ), false );
+	}
+}
