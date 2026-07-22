@@ -2,9 +2,10 @@
 /**
  * Divi Builder shortcode helpers for adamat site seeding.
  *
- * Uses Divi 4 shortcode attributes documented in:
+ * Uses Divi 4 shortcode attributes documented in docs/divi/ and:
  * - includes/builder/class-et-builder-element.php (animation + scroll effects)
  * - includes/builder/module/field/Scroll.php (scroll transform effects)
+ * - includes/builder/feature/dynamic-content.php (featured image backgrounds)
  *
  * @package MH_Dev_Kit
  */
@@ -33,6 +34,9 @@ final class AdamatDiviLayouts {
 	private const MIST   = '#e2e8f0';
 
 	private const WHITE  = '#ffffff';
+
+	/** Divi Dynamic Content token: current page/post featured image (see docs/divi/dynamic-content-options.md). */
+	private const FEATURED_IMAGE_DC = '@ET-DC@eyJkeW5hbWljIjp0cnVlLCJjb250ZW50IjoicG9zdF9mZWF0dXJlZF9pbWFnZSIsInNldHRpbmdzIjp7ImVuYWJsZV9odG1sIjoib2ZmIn19@';
 
 	private static function media( string $key ): string {
 		if ( ! class_exists( 'AdamatMediaAssets' ) ) {
@@ -723,75 +727,7 @@ CSS;
 		}
 	}
 
-	/**
-	 * Update the first section's background_image from the page featured image.
-	 */
-	public static function sync_hero_background_from_featured_image( int $post_id ): void {
-		if ( 'page' !== get_post_type( $post_id ) ) {
-			return;
-		}
-
-		if ( 'on' !== get_post_meta( $post_id, '_et_pb_use_builder', true ) ) {
-			return;
-		}
-
-		$url = get_the_post_thumbnail_url( $post_id, 'full' );
-		if ( ! is_string( $url ) || '' === $url ) {
-			return;
-		}
-
-		$content = get_post_field( 'post_content', $post_id );
-		if ( ! is_string( $content ) || '' === $content || ! str_contains( $content, '[et_pb_section' ) ) {
-			return;
-		}
-
-		$updated = preg_replace(
-			'/(\[et_pb_section[^\]]*background_image=")[^"]*(")/',
-			'$1' . esc_url( $url ) . '$2',
-			$content,
-			1
-		);
-
-		if ( ! is_string( $updated ) || $updated === $content ) {
-			return;
-		}
-
-		wp_update_post(
-			array(
-				'ID'           => $post_id,
-				'post_content' => $updated,
-			)
-		);
-	}
-
-	public static function register_hero_sync_hooks(): void {
-		add_action(
-			'save_post_page',
-			static function ( int $post_id ): void {
-				if ( wp_is_post_autosave( $post_id ) || wp_is_post_revision( $post_id ) ) {
-					return;
-				}
-
-				self::sync_hero_background_from_featured_image( $post_id );
-			},
-			30
-		);
-
-		add_action(
-			'set_post_thumbnail',
-			static function ( int $post_id ): void {
-				if ( 'page' !== get_post_type( $post_id ) ) {
-					return;
-				}
-
-				self::sync_hero_background_from_featured_image( $post_id );
-			},
-			10,
-			1
-		);
-	}
-
-	public static function home_layout( string $hero_media_key = 'hero' ): string {
+	public static function home_layout(): string {
 		return self::section(
 			self::row(
 				self::column(
@@ -806,7 +742,7 @@ CSS;
 				)
 			),
 			array_merge(
-				self::hero_section_attrs( $hero_media_key, 'center right' ),
+				self::hero_section_attrs( 'center right' ),
 				array(
 					'custom_padding'                => '130px|0|110px|0',
 					'scroll_vertical_motion_enable' => 'on',
@@ -873,7 +809,7 @@ CSS;
 		);
 	}
 
-	public static function about_layout( string $hero_media_key = 'about-team' ): string {
+	public static function about_layout(): string {
 		return self::section(
 			self::row(
 				self::column(
@@ -886,7 +822,7 @@ CSS;
 				)
 			),
 			array_merge(
-				self::hero_section_attrs( $hero_media_key, 'center' ),
+				self::hero_section_attrs( 'center' ),
 				array( 'custom_padding' => '90px|0|40px|0' )
 			)
 		)
@@ -931,7 +867,7 @@ CSS;
 		. self::services_cards_block();
 	}
 
-	public static function services_layout( string $hero_media_key = 'hero' ): string {
+	public static function services_layout(): string {
 		$content = self::section(
 			self::row(
 				self::column(
@@ -945,7 +881,7 @@ CSS;
 				)
 			),
 			array_merge(
-				self::hero_section_attrs( $hero_media_key, 'center' ),
+				self::hero_section_attrs( 'center' ),
 				array( 'custom_padding' => '90px|0|50px|0' )
 			)
 		)
@@ -975,7 +911,7 @@ CSS;
 		);
 	}
 
-	public static function projects_layout( string $hero_media_key = 'project-corporate' ): string {
+	public static function projects_layout(): string {
 		$projects = array(
 			array(
 				'title'     => 'adamat.online',
@@ -1060,7 +996,7 @@ CSS;
 				)
 			),
 			array_merge(
-				self::hero_section_attrs( $hero_media_key, 'center' ),
+				self::hero_section_attrs( 'center' ),
 				array( 'custom_padding' => '90px|0|30px|0' )
 			)
 		)
@@ -1090,7 +1026,7 @@ CSS;
 		);
 	}
 
-	public static function contact_layout( string $hero_media_key = 'contact' ): string {
+	public static function contact_layout(): string {
 		$form = '[et_pb_contact_form captcha="off" email="hello@adamat.online" title="Send a message" _builder_version="' . self::BV . '" background_color="' . self::WHITE . '" custom_padding="30px|30px|30px|30px" border_radii="on|8px|8px|8px|8px" box_shadow_style="preset1" ' . self::attrs( self::fade_in( '200ms' ) ) . '][et_pb_contact_field field_id="Name" field_title="Name" _builder_version="' . self::BV . '" /][et_pb_contact_field field_id="Email" field_title="Email Address" field_type="email" _builder_version="' . self::BV . '" /][et_pb_contact_field field_id="Message" field_title="Message" field_type="text" full_field="on" _builder_version="' . self::BV . '" /][/et_pb_contact_form]';
 
 		return self::section(
@@ -1105,7 +1041,7 @@ CSS;
 				)
 			),
 			array_merge(
-				self::hero_section_attrs( $hero_media_key, 'center' ),
+				self::hero_section_attrs( 'center' ),
 				array( 'custom_padding' => '90px|0|40px|0' )
 			)
 		)
@@ -1181,28 +1117,22 @@ CSS;
 		);
 	}
 
-	/** @return array<string, string> Hero section attrs: featured image bg + 70% black overlay. */
-	private static function hero_section_attrs( string $media_key, string $position = 'center' ): array {
+	/** @return array<string, string> Hero section attrs: dynamic featured image bg + 70% black overlay. */
+	private static function hero_section_attrs( string $position = 'center' ): array {
 		return array_merge(
-			self::hero_photo_bg( $media_key, $position ),
+			self::hero_photo_bg_dynamic( $position ),
 			self::hero_overlay()
 		);
 	}
 
-	/** @return array<string, string> */
-	private static function hero_photo_bg( string $media_key, string $position ): array {
-		$url = self::media( $media_key );
-		if ( '' === $url ) {
-			return array(
-				'background_color' => self::NAVY,
-			);
-		}
-
+	/** @return array<string, string> Uses Divi Dynamic Content for the page featured image. */
+	private static function hero_photo_bg_dynamic( string $position ): array {
 		return array(
-			'background_image'    => $url,
+			'background_image'    => self::FEATURED_IMAGE_DC,
 			'background_size'     => 'cover',
 			'background_position' => $position,
 			'background_repeat'   => 'no-repeat',
+			'background_color'    => self::NAVY,
 			'parallax'            => 'on',
 		);
 	}

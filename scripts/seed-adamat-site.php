@@ -50,7 +50,6 @@ function adamat_upsert_divi_page(
 
 	if ( '' !== $featured_media_key ) {
 		AdamatDiviLayouts::set_page_featured_image( $post_id, $featured_media_key );
-		AdamatDiviLayouts::sync_hero_background_from_featured_image( $post_id );
 	}
 
 	return $post_id;
@@ -60,11 +59,11 @@ AdamatMediaAssets::seed();
 AdamatDiviLayouts::apply_theme_options();
 AdamatDiviLayouts::seed_global_layouts();
 
-$home_id     = adamat_upsert_divi_page( 'home', 'Home', AdamatDiviLayouts::home_layout( 'hero' ), 'Australian agency — digital and AI solutions for growing businesses.', 'hero' );
-$about_id    = adamat_upsert_divi_page( 'about-us', 'About Us', AdamatDiviLayouts::about_layout( 'about-team' ), 'About adamat — Australian digital studio serving a global market.', 'about-team' );
-$services_id = adamat_upsert_divi_page( 'services', 'Services', AdamatDiviLayouts::services_layout( 'hero' ), 'Web design, eCommerce, AI, product data, hosting, and graphic design.', 'hero' );
-$projects_id = adamat_upsert_divi_page( 'projects-showcase', 'Projects Showcase', AdamatDiviLayouts::projects_layout( 'project-corporate' ), 'Selected client and internal projects.', 'project-corporate' );
-$contact_id  = adamat_upsert_divi_page( 'contact', 'Contact', AdamatDiviLayouts::contact_layout( 'contact' ), 'Get in touch with adamat.', 'contact' );
+$home_id     = adamat_upsert_divi_page( 'home', 'Home', AdamatDiviLayouts::home_layout(), 'Australian agency — digital and AI solutions for growing businesses.', 'hero' );
+$about_id    = adamat_upsert_divi_page( 'about-us', 'About Us', AdamatDiviLayouts::about_layout(), 'About adamat — Australian digital studio serving a global market.', 'about-team' );
+$services_id = adamat_upsert_divi_page( 'services', 'Services', AdamatDiviLayouts::services_layout(), 'Web design, eCommerce, AI, product data, hosting, and graphic design.', 'hero' );
+$projects_id = adamat_upsert_divi_page( 'projects-showcase', 'Projects Showcase', AdamatDiviLayouts::projects_layout(), 'Selected client and internal projects.', 'project-corporate' );
+$contact_id  = adamat_upsert_divi_page( 'contact', 'Contact', AdamatDiviLayouts::contact_layout(), 'Get in touch with adamat.', 'contact' );
 
 // Retire standalone service pages from public view (content lives on Services page).
 $retire_slugs = array(
