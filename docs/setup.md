@@ -125,6 +125,49 @@ Install later under **Plugins → Add new** (do not enable until configured):
 
 Enable new gateways under **WooCommerce → Settings → Payments**. Keep **Cash on delivery** enabled as a fallback if desired.
 
+## WordPress multisite + adamat.local
+
+The project runs as a **subdomain multisite** network:
+
+| Site | URL | Purpose |
+|------|-----|---------|
+| Main (dev) | https://cursor-wpdev2.ddev.site | WooCommerce + mh-dev-kit dev |
+| adamat | https://adamat.cursor-wpdev2.ddev.site | Local clone of [adamat.online](https://adamat.online/) |
+
+**Divi** is network-enabled and active on both sites.
+
+### Bootstrap / refresh adamat site
+
+```bash
+chmod +x scripts/setup-adamat-multisite.sh
+./scripts/setup-adamat-multisite.sh
+```
+
+This script:
+
+1. Restarts DDEV with wildcard hostname `*.cursor-wpdev2` for subsites
+2. Converts to subdomain multisite (if needed)
+3. Creates the **adamat** subsite
+4. Activates **Divi** and seeds pages
+
+### adamat service pages
+
+Primary menu: **Home · About Us · Services · Projects Showcase · Contact**
+
+All services live on `/services/` with anchor links (standalone service pages are drafted).
+
+Media assets are downloaded from approved royalty-free sources — see [wordpress/royalty-free-assets.md](wordpress/royalty-free-assets.md).
+
+| Page | Slug |
+|------|------|
+| Home | `/` |
+| About Us | `/about-us/` |
+| Services | `/services/` |
+| Projects Showcase | `/projects-showcase/` |
+| Contact | `/contact/` |
+
+**Network admin:** https://cursor-wpdev2.ddev.site/wp-admin/network/
+
 ## URLs
 
 | Service | URL |
