@@ -34,7 +34,6 @@
 		</testsuite>
 		<testsuite name="Integration">
 			<directory>tests/Unit/Integration</directory>
-			<directory>tests/Integration/Integration</directory>
 		</testsuite>
 	</testsuites>
 	<logging>

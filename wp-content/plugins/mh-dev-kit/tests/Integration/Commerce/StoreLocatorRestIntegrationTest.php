@@ -20,7 +20,8 @@ final class StoreLocatorRestIntegrationTest extends TestCase {
 		$stores->seed_defaults_if_empty();
 
 		$presenter = new StoreLocatorRestPresenter( $stores, $settings );
-		$presenter->register_routes();
+		$presenter->register();
+		do_action( 'rest_api_init' );
 
 		$request = new \WP_REST_Request( 'GET', '/mhdk/v1/stores/nearby' );
 		$request->set_param( 'lat', -33.8688 );

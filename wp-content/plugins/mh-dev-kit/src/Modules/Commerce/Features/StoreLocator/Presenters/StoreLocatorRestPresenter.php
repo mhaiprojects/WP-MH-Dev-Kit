@@ -45,12 +45,12 @@ final class StoreLocatorRestPresenter {
 					'lat' => array(
 						'required'          => true,
 						'type'              => 'number',
-						'sanitize_callback' => 'floatval',
+						'sanitize_callback' => static fn( $value ): float => (float) $value,
 					),
 					'lng' => array(
 						'required'          => true,
 						'type'              => 'number',
-						'sanitize_callback' => 'floatval',
+						'sanitize_callback' => static fn( $value ): float => (float) $value,
 					),
 				),
 			)
@@ -67,12 +67,12 @@ final class StoreLocatorRestPresenter {
 					'lat' => array(
 						'required'          => true,
 						'type'              => 'number',
-						'sanitize_callback' => 'floatval',
+						'sanitize_callback' => static fn( $value ): float => (float) $value,
 					),
 					'lng' => array(
 						'required'          => true,
 						'type'              => 'number',
-						'sanitize_callback' => 'floatval',
+						'sanitize_callback' => static fn( $value ): float => (float) $value,
 					),
 				),
 			)

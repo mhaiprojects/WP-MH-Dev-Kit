@@ -31,7 +31,8 @@ final class CommerceModulesCompatibilityTest extends TestCase {
 		);
 
 		$presenter = new InventoryRestPresenter( $inventory );
-		$presenter->register_routes();
+		$presenter->register();
+		do_action( 'rest_api_init' );
 
 		$request  = new \WP_REST_Request( 'GET', '/mhdk/v1/inventory/101/stores' );
 		$response = rest_get_server()->dispatch( $request );
@@ -50,7 +51,8 @@ final class CommerceModulesCompatibilityTest extends TestCase {
 		$stores->seed_defaults_if_empty();
 
 		$locator_presenter = new StoreLocatorRestPresenter( $stores, $settings );
-		$locator_presenter->register_routes();
+		$locator_presenter->register();
+		do_action( 'rest_api_init' );
 
 		$nearby_request = new \WP_REST_Request( 'GET', '/mhdk/v1/stores/nearby' );
 		$nearby_request->set_param( 'lat', -37.8136 );
@@ -65,6 +67,10 @@ final class CommerceModulesCompatibilityTest extends TestCase {
 		}
 
 		$inventory->save_levels_for_product( 202, $levels );
+
+		$inventory_presenter = new InventoryRestPresenter( $inventory );
+		$inventory_presenter->register();
+		do_action( 'rest_api_init' );
 
 		$stock_request = new \WP_REST_Request( 'GET', '/mhdk/v1/inventory/202/stores' );
 		$stock_data    = rest_get_server()->dispatch( $stock_request )->get_data();

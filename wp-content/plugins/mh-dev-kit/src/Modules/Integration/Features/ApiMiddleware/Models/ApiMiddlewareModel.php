@@ -184,27 +184,38 @@ final class ApiMiddlewareModel {
 	 * @return array<string, mixed>
 	 */
 	private function normalize_connection( array $connection ): array {
-		$id = sanitize_key( (string) ( $connection['id'] ?? uniqid( 'api-', true ) ) );
+		$id     = sanitize_key( (string) ( $connection['id'] ?? uniqid( 'api-', true ) ) );
+		$method = strtoupper( (string) ( $connection['method'] ?? 'GET' ) );
+		if ( ! in_array( $method, array( 'GET', 'POST' ), true ) ) {
+			$method = 'GET';
+		}
+
+		$auth_type = (string) ( $connection['auth_type'] ?? 'none' );
+		if ( ! in_array( $auth_type, array( 'none', 'bearer', 'basic', 'api_key' ), true ) ) {
+			$auth_type = 'none';
+		}
+
+		$schedule = (string) ( $connection['schedule'] ?? 'manual' );
+		if ( ! in_array( $schedule, array( 'manual', 'hourly', 'daily' ), true ) ) {
+			$schedule = 'manual';
+		}
+
+		$target_type = (string) ( $connection['target_type'] ?? 'option' );
+		if ( ! in_array( $target_type, array( 'option', 'transient' ), true ) ) {
+			$target_type = 'option';
+		}
 
 		return array(
 			'id'          => $id,
 			'name'        => sanitize_text_field( (string) ( $connection['name'] ?? $id ) ),
 			'base_url'    => esc_url_raw( (string) ( $connection['base_url'] ?? '' ) ),
 			'endpoint'    => sanitize_text_field( (string) ( $connection['endpoint'] ?? '/' ) ),
-			'method'      => in_array( strtoupper( (string) ( $connection['method'] ?? 'GET' ) ), array( 'GET', 'POST' ), true )
-				? strtoupper( (string) $connection['method'] )
-				: 'GET',
-			'auth_type'   => in_array( (string) ( $connection['auth_type'] ?? 'none' ), array( 'none', 'bearer', 'basic', 'api_key' ), true )
-				? (string) $connection['auth_type']
-				: 'none',
+			'method'      => $method,
+			'auth_type'   => $auth_type,
 			'auth_header' => sanitize_text_field( (string) ( $connection['auth_header'] ?? 'Authorization' ) ),
 			'auth_value'  => sanitize_text_field( (string) ( $connection['auth_value'] ?? '' ) ),
-			'schedule'    => in_array( (string) ( $connection['schedule'] ?? 'manual' ), array( 'manual', 'hourly', 'daily' ), true )
-				? (string) $connection['schedule']
-				: 'manual',
-			'target_type' => in_array( (string) ( $connection['target_type'] ?? 'option' ), array( 'option', 'transient' ), true )
-				? (string) $connection['target_type']
-				: 'option',
+			'schedule'    => $schedule,
+			'target_type' => $target_type,
 			'target_key'  => sanitize_key( (string) ( $connection['target_key'] ?? 'mhdk_api_data_' . $id ) ),
 			'enabled'     => ! empty( $connection['enabled'] ),
 			'last_run'    => (int) ( $connection['last_run'] ?? 0 ),
