@@ -39,7 +39,7 @@ final class HybridPricingFrontendPresenter {
 			return '';
 		}
 
-		if ( $this->resolver()->should_hide_price_html() ) {
+		if ( $this->resolver()->should_hide_price_for_product( (int) $product->get_id() ) ) {
 			return $this->resolver()->get_hidden_price_html();
 		}
 

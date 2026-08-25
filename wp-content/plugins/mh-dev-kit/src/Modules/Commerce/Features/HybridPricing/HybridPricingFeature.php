@@ -13,8 +13,10 @@ use MH\DevKit\Core\FeatureInterface;
 use MH\DevKit\Modules\Commerce\Features\HybridPricing\Models\HybridPricingSettingsModel;
 use MH\DevKit\Modules\Commerce\Features\HybridPricing\Models\PriceListModel;
 use MH\DevKit\Modules\Commerce\Features\HybridPricing\Presenters\HybridPricingAdminPresenter;
+use MH\DevKit\Modules\Commerce\Features\HybridPricing\Presenters\HybridPricingCartPresenter;
 use MH\DevKit\Modules\Commerce\Features\HybridPricing\Presenters\HybridPricingFrontendPresenter;
 use MH\DevKit\Modules\Commerce\Features\HybridPricing\Presenters\HybridPricingProductPresenter;
+use MH\DevKit\Modules\Commerce\Features\HybridPricing\Presenters\HybridPricingUserPresenter;
 
 final class HybridPricingFeature implements FeatureInterface {
 
@@ -34,7 +36,9 @@ final class HybridPricingFeature implements FeatureInterface {
 		$price_lists = new PriceListModel();
 
 		( new HybridPricingFrontendPresenter() )->register();
+		( new HybridPricingCartPresenter() )->register();
 		( new HybridPricingProductPresenter() )->register();
+		( new HybridPricingUserPresenter( $price_lists ) )->register();
 		( new HybridPricingAdminPresenter( $settings, $price_lists ) )->register();
 	}
 

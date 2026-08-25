@@ -25,6 +25,18 @@ final class PriceResolver {
 		return $this->settings->hide_prices_for_current_user();
 	}
 
+	public function should_hide_price_for_product( int $product_id ): bool {
+		if ( HybridPricingSettingsModel::current_user_is_b2b() ) {
+			return false;
+		}
+
+		if ( 'yes' === get_post_meta( $product_id, '_mhdk_hide_price_b2c', true ) ) {
+			return true;
+		}
+
+		return $this->settings->hide_prices_for_current_user();
+	}
+
 	public function get_hidden_price_html(): string {
 		$message = (string) $this->settings->get( 'login_for_prices_message', '' );
 

@@ -23,6 +23,22 @@ Bootstrap: `src/Core/AcornBootstrap.php` (loaded on `plugins_loaded` priority 1)
 ## Assign B2B access
 
 1. Users → edit user → Role: **B2B Customer**, or
-2. Assign custom price lists via user meta `mhdk_price_list_ids` (array of list IDs)
+2. Users → edit user → **MH Dev Kit — B2B pricing** → assign price lists
+3. Custom price lists via user meta `mhdk_price_list_ids` (array of list IDs)
 
 Default list ID: `wholesale-default`
+
+## Demo seed (main site)
+
+```bash
+./scripts/seed-hybrid-pricing-demo.sh
+```
+
+Creates category/product price rules, a B2B demo user (`mhdk_b2b_demo` / `demo-b2b-pass`), and sample product flags.
+
+## Production behaviour
+
+- **Lowest price wins** when product and category rules overlap
+- **Cart/checkout** applies B2B resolved prices via `woocommerce_before_calculate_totals`
+- **Purchasing blocked** for guests/B2C when prices are hidden or product is B2B-only
+- **REST API** strips or adjusts prices for non-B2B callers
