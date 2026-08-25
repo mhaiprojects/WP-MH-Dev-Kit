@@ -15,6 +15,9 @@ use MH\DevKit\Core\Admin\ModuleAdminContributorInterface;
 use MH\DevKit\Core\ModuleInterface;
 use MH\DevKit\Core\ModuleRequirements;
 use MH\DevKit\Core\ViewRenderer;
+use MH\DevKit\Modules\Commerce\Features\HybridPricing\HybridPricingFeature;
+use MH\DevKit\Modules\Commerce\Features\HybridPricing\Models\HybridPricingSettingsModel;
+use MH\DevKit\Modules\Commerce\Features\HybridPricing\Presenters\HybridPricingAdminPresenter;
 use MH\DevKit\Modules\Commerce\Features\InventoryManagement\InventoryManagementFeature;
 use MH\DevKit\Modules\Commerce\Features\InventoryManagement\Models\InventoryModel;
 use MH\DevKit\Modules\Commerce\Features\InventoryManagement\Models\InventorySettingsModel;
@@ -35,6 +38,8 @@ final class CommerceModule implements ModuleInterface, ModuleAdminContributorInt
 
 	private InventoryAdminPresenter $inventory_admin;
 
+	private HybridPricingAdminPresenter $hybrid_pricing_admin;
+
 	public static function id(): string {
 		return 'commerce';
 	}
@@ -44,7 +49,7 @@ final class CommerceModule implements ModuleInterface, ModuleAdminContributorInt
 	}
 
 	public static function description(): string {
-		return __( 'WooCommerce features: Order Menu, Store Locator, and Inventory Management.', 'mh-dev-kit' );
+		return __( 'WooCommerce features: Order Menu, Store Locator, Inventory, and Hybrid B2B/B2C Pricing.', 'mh-dev-kit' );
 	}
 
 	public static function features(): array {
@@ -52,6 +57,7 @@ final class CommerceModule implements ModuleInterface, ModuleAdminContributorInt
 			OrderMenuFeature::class,
 			StoreLocatorFeature::class,
 			InventoryManagementFeature::class,
+			HybridPricingFeature::class,
 		);
 	}
 
@@ -67,12 +73,18 @@ final class CommerceModule implements ModuleInterface, ModuleAdminContributorInt
 		);
 		$this->inventory_admin          = new InventoryAdminPresenter(
 			new InventoryModel(),
-			new InventorySettingsModel()
+			new InventorySettingsModel(),
+			new StoreLocatorModel()
+		);
+		$this->hybrid_pricing_admin     = new HybridPricingAdminPresenter(
+			new HybridPricingSettingsModel(),
+			new \MH\DevKit\Modules\Commerce\Features\HybridPricing\Models\PriceListModel()
 		);
 
 		$this->admin->register();
 		$this->store_locator_settings->register();
 		$this->inventory_admin->register();
+		$this->hybrid_pricing_admin->register();
 
 		foreach ( self::features() as $feature_class ) {
 			( new $feature_class() )->register();
@@ -83,6 +95,7 @@ final class CommerceModule implements ModuleInterface, ModuleAdminContributorInt
 		$admin                  = $this->admin;
 		$store_locator_settings = $this->store_locator_settings;
 		$inventory_admin        = $this->inventory_admin;
+		$hybrid_pricing_admin   = $this->hybrid_pricing_admin;
 
 		$registrar->add_module_menu(
 			self::id(),
@@ -119,6 +132,16 @@ final class CommerceModule implements ModuleInterface, ModuleAdminContributorInt
 		);
 
 		$registrar->add_module_submenu(
+			HybridPricingSettingsModel::SETTINGS_SLUG,
+			__( 'Hybrid Pricing', AdminMenu::TEXT_DOMAIN ),
+			__( 'Hybrid B2B/B2C Pricing', AdminMenu::TEXT_DOMAIN ),
+			static function () use ( $hybrid_pricing_admin ): void {
+				$hybrid_pricing_admin->render_settings_page();
+			},
+			'manage_woocommerce'
+		);
+
+		$registrar->add_module_submenu(
 			AdminMenu::COMMERCE_CONTENT_SLUG,
 			__( 'Commerce Content', AdminMenu::TEXT_DOMAIN ),
 			__( 'Commerce Content', AdminMenu::TEXT_DOMAIN ),
@@ -128,10 +151,18 @@ final class CommerceModule implements ModuleInterface, ModuleAdminContributorInt
 	}
 
 	public function render_module_hub(): void {
+		$inventory = new InventoryModel();
+		$settings  = new StoreLocatorSettingsModel();
+		$stores    = new StoreLocatorModel();
+		$all       = $inventory->get_all();
+
 		ViewRenderer::display(
 			'Modules/Commerce/Views/module-hub.php',
 			array(
-				'version' => MH_DEV_KIT_VERSION,
+				'version'            => MH_DEV_KIT_VERSION,
+				'checkout_enabled'   => $settings->checkout_enabled(),
+				'active_stores'      => count( $stores->get_active() ),
+				'inventory_products' => count( $all ),
 			)
 		);
 	}

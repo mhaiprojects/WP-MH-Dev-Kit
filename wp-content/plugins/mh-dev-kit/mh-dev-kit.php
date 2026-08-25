@@ -48,9 +48,21 @@ if ( ! is_readable( $autoload ) ) {
 
 require_once $autoload;
 
-add_action( 'plugins_loaded', static function (): void {
-	MH\DevKit\Core\Plugin::boot();
-} );
+add_action(
+	'init',
+	static function (): void {
+		MH\DevKit\Core\AcornBootstrap::boot();
+	},
+	1
+);
+
+add_action(
+	'plugins_loaded',
+	static function (): void {
+		MH\DevKit\Core\Plugin::boot();
+	},
+	20
+);
 
 /**
  * Activation hook.

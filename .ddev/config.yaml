@@ -4,7 +4,8 @@ docroot: ""
 php_version: "8.3"
 webserver_type: nginx-fpm
 xdebug_enabled: false
-additional_hostnames: []
+additional_hostnames:
+    - "*.cursor-wpdev2"
 additional_fqdns: []
 database:
     type: mariadb
@@ -13,4 +14,6 @@ use_dns_when_possible: true
 composer_version: "2"
 web_environment:
     - WP_ENVIRONMENT_TYPE=local
-corepack_enable: false
+hooks:
+    post-start:
+        - exec-host: bash scripts/ensure-multisite-wp-config.sh

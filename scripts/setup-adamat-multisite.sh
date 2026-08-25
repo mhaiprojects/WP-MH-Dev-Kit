@@ -10,20 +10,7 @@ ADAMAT_SLUG="adamat"
 WP_CONFIG="$ROOT/wp-config.php"
 
 ensure_multisite_constants() {
-  if grep -q "define( 'MULTISITE', true )" "$WP_CONFIG"; then
-    return
-  fi
-
-  echo "==> Adding multisite constants to wp-config.php..."
-  sed -i "/stop editing/i\\
-define( 'WP_ALLOW_MULTISITE', true );\\
-define( 'MULTISITE', true );\\
-define( 'SUBDOMAIN_INSTALL', true );\\
-define( 'DOMAIN_CURRENT_SITE', 'cursor-wpdev2.ddev.site' );\\
-define( 'PATH_CURRENT_SITE', '/' );\\
-define( 'SITE_ID_CURRENT_SITE', 1 );\\
-define( 'BLOG_ID_CURRENT_SITE', 1 );\\
-" "$WP_CONFIG"
+  bash "$ROOT/scripts/ensure-multisite-wp-config.sh"
 }
 
 run() {
@@ -53,7 +40,7 @@ run() {
   ddev wp theme activate Divi --url="${ADAMAT_URL}"
 
   echo "==> Creating adamat pages..."
-  ddev wp eval-file "$ROOT/scripts/seed-adamat-site.php" --url="${ADAMAT_URL}"
+  ddev wp eval-file scripts/seed-adamat-site.php --url="${ADAMAT_URL}"
 
   echo ""
   echo "Done."

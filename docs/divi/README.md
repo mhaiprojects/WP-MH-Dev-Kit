@@ -1,6 +1,22 @@
 # Divi block documentation (local mirror)
 
-Offline copies of [Elegant Themes Divi documentation](https://www.elegantthemes.com/documentation/divi/) for modules and features used in the adamat site seed.
+Offline copies of [Elegant Themes Divi documentation](https://www.elegantthemes.com/documentation/divi/) for modules and features used in site seeds.
+
+## Live demo subsite
+
+**URL:** [https://divi-demo.cursor-wpdev2.ddev.site/](https://divi-demo.cursor-wpdev2.ddev.site/)
+
+Subdomain multisite showcase with every standard Divi 4 module, row/column grid layout, and advanced builder settings (animation, scroll, gradients, borders).
+
+| Setup | Command |
+|-------|---------|
+| Create subsite + seed pages | `./scripts/setup-divi-demo-multisite.sh` |
+| Reseed pages only | `ddev wp eval-file scripts/seed-divi-demo-site.php --url=https://divi-demo.cursor-wpdev2.ddev.site` |
+| Regenerate module catalog | `ddev exec php scripts/extract-divi-module-reference.php` |
+
+**Agent skill:** `.cursor/skills/divi-builder/SKILL.md` (layouts, grids, module slugs, advanced settings).
+
+**Module catalog (JSON):** [module-catalog.json](./module-catalog.json) — 55 standard + 25 WooCommerce modules extracted from theme PHP.
 
 ## Built-in first workflow
 
