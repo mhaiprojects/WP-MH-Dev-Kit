@@ -35,9 +35,9 @@
 		$tbody.find('tr.temp-app-group-head, tr.temp-app-group-spacer, tr.temp-app-clone').remove();
 		$tbody.find('tr.cart_item, tr.woocommerce-cart-form__cart-item').each(function () {
 			var $row = $(this);
-			$row.removeClass('temp-app-group-row temp-app-group-last temp-app-group--set temp-app-group--leftover temp-app-group--other');
+			$row.removeClass('temp-app-group-row temp-app-group-last temp-app-group--set temp-app-group--incomplete temp-app-group--other');
 			$row.removeAttr('data-temp-app-group');
-			$row.find('.temp-app-set-qty-badge').remove();
+			$row.find('.temp-app-set-qty-badge, .temp-app-incomplete-note').remove();
 		});
 	}
 
@@ -49,7 +49,23 @@
 		return '\u00d7 ' + qty + ' in this group';
 	}
 
-	function makeCloneRow($orig, qty, cols, type, groupId) {
+	function incompleteNote(item) {
+		if (!item || !item.deal_label) {
+			return '';
+		}
+		var need = parseInt(item.need, 10) || 0;
+		return item.deal_label + ': add ' + need + ' more to complete a set';
+	}
+
+	function appendIncompleteNote($name, item) {
+		var note = incompleteNote(item);
+		if (!note) {
+			return;
+		}
+		$name.append($('<span class="temp-app-incomplete-note"></span>').text(note));
+	}
+
+	function makeCloneRow($orig, qty, cols, type, groupId, item) {
 		var $clone = $('<tr class="cart_item temp-app-clone woocommerce-cart-form__cart-item"></tr>');
 		$clone.addClass('temp-app-group-row temp-app-group--' + type);
 		$clone.attr('data-temp-app-group', groupId);
@@ -58,7 +74,7 @@
 
 		var $thumb = $orig.find('td.product-thumbnail').first().clone();
 		var $name = $orig.find('td.product-name').first().clone();
-		$name.find('input, select, textarea, button, .temp-app-set-qty-badge').remove();
+		$name.find('input, select, textarea, button, .temp-app-set-qty-badge, .temp-app-incomplete-note').remove();
 		$name.find('[name],[id]').removeAttr('name').removeAttr('id');
 		$clone.append($thumb).append($name);
 
@@ -66,11 +82,12 @@
 		if (span < 1) {
 			span = 1;
 		}
-		$clone.append(
-			$('<td class="temp-app-clone-qty" colspan="' + span + '"></td>').html(
-				'<span class="temp-app-set-qty-label">' + setQtyLabel(qty) + '</span>'
-			)
-		);
+		var $qtyCell = $('<td class="temp-app-clone-qty" colspan="' + span + '"></td>');
+		$qtyCell.append($('<span class="temp-app-set-qty-label"></span>').text(setQtyLabel(qty)));
+		if (type === 'incomplete') {
+			appendIncompleteNote($qtyCell, item);
+		}
+		$clone.append($qtyCell);
 
 		return $clone;
 	}
@@ -175,13 +192,16 @@
 					if ((keyAppearances[key] || 0) > 1) {
 						addBadge($row, qty);
 					}
+					if (group.type === 'incomplete') {
+						appendIncompleteNote($row.find('td.product-name').first(), item);
+					}
 					if (insertBefore) {
 						$row.insertBefore(insertBefore);
 					} else {
 						$tbody.append($row);
 					}
 				} else {
-					var $clone = makeCloneRow($row, qty, cols, group.type, group.id);
+					var $clone = makeCloneRow($row, qty, cols, group.type, group.id, item);
 					if (isLastItem) {
 						$clone.addClass('temp-app-group-last');
 					}

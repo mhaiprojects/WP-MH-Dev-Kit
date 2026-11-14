@@ -404,5 +404,187 @@ final class DealCalculatorTest extends TestCase {
 		$this->assertSame( array( 'tomx1', 'spagx1', 'cornx2' ), $members( $any4[0] ) );
 		$this->assertSame( 700, $any4[0]['regular_cents'] );
 	}
+
+	public function test_leftover_reassigned_to_second_deal_completes_set(): void {
+		$lines = array(
+			array(
+				'key'                => 'dual',
+				'product_id'         => 1,
+				'unit_price_cents'   => 300,
+				'qty'                => 4,
+				'tags'               => array( 'any-3', 'any-4' ),
+			),
+			array(
+				'key'                => 'b-only',
+				'product_id'         => 2,
+				'unit_price_cents'   => 250,
+				'qty'                => 3,
+				'tags'               => array( 'any-4' ),
+			),
+		);
+		$r = $this->calc( $lines, array( self::ANY_3, self::ANY_4 ) );
+
+		$this->assertSame( array( 200 ), $this->deal_savings( $r, 'any-3' ) );
+		$this->assertSame( array( 550 ), $this->deal_savings( $r, 'any-4' ) ); // 300+250+250+250=1050 - 500.
+
+		$any3 = $r['deals'][0];
+		$this->assertSame( 0, $any3['leftover_qty'] );
+
+		$any4 = $r['deals'][1];
+		$this->assertCount( 1, $any4['sets'] );
+		$this->assertSame( array( 'dual' ), $any4['sets'][0]['reassigned_keys'] );
+		$this->assertSame( 4, array_sum( array_column( $any4['sets'][0]['items'], 'qty' ) ) );
+
+		$this->assert_units_conserved( $lines, $r );
+	}
+
+	public function test_leftover_eligible_for_b_but_pool_under_n_stays_with_primary(): void {
+		$lines = array(
+			array(
+				'key'                => 'x',
+				'product_id'         => 1,
+				'unit_price_cents'   => 300,
+				'qty'                => 4,
+				'tags'               => array( 'any-3', 'any-4' ),
+			),
+			array(
+				'key'                => 'y',
+				'product_id'         => 2,
+				'unit_price_cents'   => 200,
+				'qty'                => 1,
+				'tags'               => array( 'any-4' ),
+			),
+		);
+		$r = $this->calc( $lines, array( self::ANY_3, self::ANY_4 ) );
+
+		$this->assertSame( 1, $r['deals'][0]['leftover_qty'] );
+		$this->assertSame( 'x', $r['deals'][0]['leftover'][0]['key'] );
+		$this->assertSame( array(), $this->deal_savings( $r, 'any-4' ) );
+		$this->assertSame( 1, $r['deals'][1]['leftover_qty'] );
+	}
+
+	public function test_single_deal_no_reassignment_four_units(): void {
+		$lines = array(
+			array(
+				'key'                => 'a',
+				'product_id'         => 1,
+				'unit_price_cents'   => 300,
+				'qty'                => 4,
+				'tags'               => array( 'any-3' ),
+			),
+		);
+		$r = $this->calc( $lines, array( self::ANY_3 ) );
+		$this->assertCount( 1, $r['deals'][0]['sets'] );
+		$this->assertSame( 1, $r['deals'][0]['leftover_qty'] );
+		$this->assertSame( array(), $r['deals'][0]['sets'][0]['reassigned_keys'] );
+	}
+
+	public function test_single_deal_no_reassignment_six_units_any_four(): void {
+		$lines = array(
+			array(
+				'key'                => 'a',
+				'product_id'         => 1,
+				'unit_price_cents'   => 200,
+				'qty'                => 6,
+				'tags'               => array( 'any-4' ),
+			),
+		);
+		$b = array(
+			'tag'         => 'any-4',
+			'qty'         => 4,
+			'price_cents' => 500,
+			'label'       => 'Any 4 for $5',
+		);
+		$r = $this->calc( $lines, array( $b ) );
+		$this->assertCount( 1, $r['deals'][0]['sets'] );
+		$this->assertSame( 2, $r['deals'][0]['leftover_qty'] );
+	}
+
+	public function test_every_set_item_qty_sums_to_bundle_n(): void {
+		$lines = array(
+			array( 'key' => 'pasta', 'product_id' => 1, 'unit_price_cents' => 220, 'qty' => 6, 'tags' => array( 'any-3' ) ),
+			array( 'key' => 'dual', 'product_id' => 2, 'unit_price_cents' => 300, 'qty' => 4, 'tags' => array( 'any-3', 'any-4' ) ),
+			array( 'key' => 'b4', 'product_id' => 3, 'unit_price_cents' => 250, 'qty' => 3, 'tags' => array( 'any-4' ) ),
+		);
+		$r = $this->calc( $lines, array( self::ANY_3, self::ANY_4 ) );
+		foreach ( $r['deals'] as $deal ) {
+			$n = (int) $deal['qty'];
+			foreach ( $deal['sets'] as $set ) {
+				$sum = 0;
+				foreach ( $set['items'] as $item ) {
+					$sum += (int) $item['qty'];
+				}
+				$this->assertSame( $n, $sum, $deal['tag'] );
+			}
+		}
+	}
+
+	public function test_leftover_reassigned_into_deal_with_no_primary_units(): void {
+		$lines = array(
+			array( 'key' => 'dual', 'product_id' => 1, 'unit_price_cents' => 300, 'qty' => 7, 'tags' => array( 'any-4', 'any-3' ) ),
+		);
+		// Config order: Any 4 first, so all 7 units are primary to Any 4 (1 set + 3 leftover); the 3 leftovers complete an Any 3 set.
+		$r = $this->calc( $lines, array( self::ANY_4, self::ANY_3 ) );
+		$this->assertSame( array( 700 ), $this->deal_savings( $r, 'any-4' ) ); // 1200 - 500.
+		$this->assertSame( array( 200 ), $this->deal_savings( $r, 'any-3' ) ); // 900 - 700.
+		$this->assertSame( 0, $r['deals'][0]['leftover_qty'] );
+		$this->assertSame( 'any-3', $r['deals'][1]['tag'] );
+		$this->assertSame( array( 'dual' ), $r['deals'][1]['sets'][0]['reassigned_keys'] );
+		$this->assert_units_conserved( $lines, $r );
+	}
+
+	public function test_current_store_cart_unchanged_by_reassignment(): void {
+		// Mirrors the on-screen 20-product cart: no product is tagged for more than one deal.
+		$lines = array(
+			array( 'key' => 'fruit', 'product_id' => 10, 'unit_price_cents' => 350, 'qty' => 4, 'tags' => array( 'any-3' ) ),
+			array( 'key' => 'apple', 'product_id' => 16, 'unit_price_cents' => 300, 'qty' => 5, 'tags' => array( 'any-3' ) ),
+			array( 'key' => 'orange', 'product_id' => 17, 'unit_price_cents' => 300, 'qty' => 5, 'tags' => array( 'any-3' ) ),
+			array( 'key' => 'pasta', 'product_id' => 14, 'unit_price_cents' => 220, 'qty' => 6, 'tags' => array( 'any-3' ) ),
+			array( 'key' => 'tom', 'product_id' => 19, 'unit_price_cents' => 220, 'qty' => 1, 'tags' => array( 'any-4' ) ),
+			array( 'key' => 'spag', 'product_id' => 12, 'unit_price_cents' => 180, 'qty' => 1, 'tags' => array( 'any-4' ) ),
+			array( 'key' => 'corn', 'product_id' => 41, 'unit_price_cents' => 150, 'qty' => 2, 'tags' => array( 'any-4' ) ),
+			array( 'key' => 'chick', 'product_id' => 42, 'unit_price_cents' => 140, 'qty' => 2, 'tags' => array( 'any-4' ) ),
+		);
+		$r = $this->calc( $lines, array( self::ANY_3, self::ANY_4 ) );
+		$this->assertSame( 1120, $this->deal_total_saving( $r, 'any-3' ) );
+		$this->assertSame( 200, $this->deal_total_saving( $r, 'any-4' ) );
+		$this->assertSame( 2, $r['deals'][0]['leftover_qty'] );
+		$this->assertSame( 2, $r['deals'][1]['leftover_qty'] );
+		foreach ( $r['deals'] as $deal ) {
+			foreach ( $deal['sets'] as $set ) {
+				$this->assertSame( array(), $set['reassigned_keys'] );
+			}
+		}
+		$this->assert_units_conserved( $lines, $r );
+	}
+
+	/**
+	 * @param list<array{key:string,qty:int,unit_price_cents:int}> $lines Lines.
+	 * @param array{deals:list<array<string,mixed>>}               $result Calculator output.
+	 */
+	private function assert_units_conserved( array $lines, array $result ): void {
+		$expected = array();
+		foreach ( $lines as $line ) {
+			$expected[ $line['key'] ] = (int) $line['qty'];
+		}
+
+		$found = array();
+		foreach ( $result['deals'] as $deal ) {
+			foreach ( $deal['sets'] as $set ) {
+				foreach ( $set['items'] as $item ) {
+					$key = $item['key'];
+					$found[ $key ] = ( $found[ $key ] ?? 0 ) + (int) $item['qty'];
+				}
+			}
+			foreach ( $deal['leftover'] as $item ) {
+				$key = $item['key'];
+				$found[ $key ] = ( $found[ $key ] ?? 0 ) + (int) $item['qty'];
+			}
+		}
+
+		foreach ( $expected as $key => $qty ) {
+			$this->assertSame( $qty, $found[ $key ] ?? 0, 'key ' . $key );
+		}
+	}
 }
 

@@ -14,7 +14,7 @@ tr.temp-app-group-head.temp-app-group--set td {
 	border-right-color: #059669;
 }
 
-tr.temp-app-group-head.temp-app-group--leftover td {
+tr.temp-app-group-head.temp-app-group--incomplete td {
 	background: #fffbeb;
 	border-left-color: #d97706;
 	border-right-color: #d97706;
@@ -43,12 +43,12 @@ tr.temp-app-group-row.temp-app-group--set td:last-child {
 	border-right: 3px solid #059669;
 }
 
-tr.temp-app-group-row.temp-app-group--leftover td:first-child,
-tr.temp-app-group-row.temp-app-group--leftover td.product-remove {
+tr.temp-app-group-row.temp-app-group--incomplete td:first-child,
+tr.temp-app-group-row.temp-app-group--incomplete td.product-remove {
 	border-left: 3px solid #d97706;
 }
 
-tr.temp-app-group-row.temp-app-group--leftover td:last-child {
+tr.temp-app-group-row.temp-app-group--incomplete td:last-child {
 	border-right: 3px solid #d97706;
 }
 
@@ -69,8 +69,15 @@ tr.temp-app-group-row.temp-app-group--set.temp-app-group-last td {
 	border-bottom-color: #059669;
 }
 
-tr.temp-app-group-row.temp-app-group--leftover.temp-app-group-last td {
+tr.temp-app-group-row.temp-app-group--incomplete.temp-app-group-last td {
 	border-bottom-color: #d97706;
+}
+
+.temp-app-incomplete-note {
+	display: block;
+	font-size: 0.8em;
+	margin-top: 0.35em;
+	color: #92400e;
 }
 
 tr.temp-app-clone {

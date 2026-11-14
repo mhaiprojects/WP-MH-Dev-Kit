@@ -129,11 +129,14 @@ final class Temp_App_Cart_Groups {
 
 		/** @var array<string,int> $in_deal_qty Units allocated to a deal (sets or leftover). */
 		$in_deal_qty = array();
+		/** @var list<array{key:string,qty:int,deal_label:string,need:int}> $incomplete_items */
+		$incomplete_items = array();
 
 		foreach ( $deals as $deal ) {
 			$tag         = isset( $deal['tag'] ) ? (string) $deal['tag'] : '';
 			$label       = isset( $deal['label'] ) ? (string) $deal['label'] : '';
 			$price_cents = isset( $deal['price_cents'] ) ? (int) $deal['price_cents'] : 0;
+			$set_units   = isset( $deal['qty'] ) ? (int) $deal['qty'] : 0;
 			$sets        = isset( $deal['sets'] ) && is_array( $deal['sets'] ) ? $deal['sets'] : array();
 			$need        = isset( $deal['need'] ) ? (int) $deal['need'] : 0;
 			$leftover    = isset( $deal['leftover'] ) && is_array( $deal['leftover'] ) ? $deal['leftover'] : array();
@@ -144,6 +147,7 @@ final class Temp_App_Cart_Groups {
 				$regular_cents = isset( $set['regular_cents'] ) ? (int) $set['regular_cents'] : 0;
 				$index         = isset( $set['index'] ) ? (int) $set['index'] : 0;
 				$raw_items     = isset( $set['items'] ) && is_array( $set['items'] ) ? $set['items'] : array();
+				$reassigned    = isset( $set['reassigned_keys'] ) && is_array( $set['reassigned_keys'] ) ? $set['reassigned_keys'] : array();
 				$items         = self::items_for_display( $raw_items );
 
 				foreach ( $items as $row ) {
@@ -173,6 +177,11 @@ final class Temp_App_Cart_Groups {
 					);
 				}
 
+				$reassign_note = self::reassigned_units_note( $raw_items, $reassigned, $set );
+				if ( '' !== $reassign_note ) {
+					$subheading .= ' ' . $reassign_note;
+				}
+
 				$groups[] = array(
 					'id'            => $tag . '-' . $index,
 					'type'          => 'set',
@@ -187,6 +196,7 @@ final class Temp_App_Cart_Groups {
 					'items'         => $items,
 					'saves'         => $saves,
 					'saving_cents'  => $saving_cents,
+					'set_units'     => $set_units,
 				);
 			}
 
@@ -198,25 +208,24 @@ final class Temp_App_Cart_Groups {
 						$in_deal_qty[ $key ] = 0;
 					}
 					$in_deal_qty[ $key ] += (int) $row['qty'];
+					$incomplete_items[]  = array(
+						'key'        => $key,
+						'qty'        => (int) $row['qty'],
+						'deal_label' => $label,
+						'need'       => $need,
+					);
 				}
-
-				$groups[] = array(
-					'id'         => $tag . '-leftover',
-					'type'       => 'leftover',
-					'heading'    => sprintf(
-						/* translators: %s: deal label */
-						__( '%1$s — Not yet in a deal', 'temp-app' ),
-						$label
-					),
-					'subheading' => sprintf(
-						/* translators: %d: items still needed */
-						__( 'Add %d more eligible item(s) to complete another set', 'temp-app' ),
-						$need
-					),
-					'items'      => $left_items,
-					'need'       => $need,
-				);
 			}
+		}
+
+		if ( array() !== $incomplete_items ) {
+			$groups[] = array(
+				'id'         => 'incomplete',
+				'type'       => 'incomplete',
+				'heading'    => __( 'Incomplete deals', 'temp-app' ),
+				'subheading' => __( 'These items are not in a complete set and get no discount', 'temp-app' ),
+				'items'      => $incomplete_items,
+			);
 		}
 
 		$unassigned = isset( $result['unassigned_keys'] ) && is_array( $result['unassigned_keys'] )
@@ -261,6 +270,41 @@ final class Temp_App_Cart_Groups {
 		}
 
 		return array( 'groups' => $groups );
+	}
+
+	/**
+	 * @param list<array{key:string,qty:int}> $raw_items       Set items with qty.
+	 * @param list<string>                    $reassigned_keys Foreign cart keys.
+	 * @param array<string,mixed>             $set             Calculator set row.
+	 */
+	private static function reassigned_units_note( array $raw_items, array $reassigned_keys, array $set ): string {
+		if ( array() === $reassigned_keys ) {
+			return '';
+		}
+
+		$foreign_key_map = array_fill_keys( $reassigned_keys, true );
+		$moved_qty       = 0;
+		foreach ( $raw_items as $row ) {
+			$key = isset( $row['key'] ) ? (string) $row['key'] : '';
+			if ( isset( $foreign_key_map[ $key ] ) ) {
+				$moved_qty += isset( $row['qty'] ) ? (int) $row['qty'] : 0;
+			}
+		}
+		if ( $moved_qty < 1 ) {
+			return '';
+		}
+
+		$other_label = isset( $set['reassigned_from_label'] ) ? (string) $set['reassigned_from_label'] : '';
+		if ( '' === $other_label ) {
+			$other_label = __( 'another deal', 'temp-app' );
+		}
+
+		return sprintf(
+			/* translators: 1: unit count 2: deal label items were moved from */
+			__( '(includes %1$d moved from %2$s)', 'temp-app' ),
+			$moved_qty,
+			$other_label
+		);
 	}
 
 	/**
