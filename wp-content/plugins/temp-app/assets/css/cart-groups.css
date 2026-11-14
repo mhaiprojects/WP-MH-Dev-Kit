@@ -1,0 +1,111 @@
+/* TempApp cart deal grouping (display only). */
+
+tr.temp-app-group-head td {
+	background: #f3f4f6;
+	border-left: 3px solid #9ca3af;
+	border-right: 3px solid #9ca3af;
+	font-weight: 600;
+	padding: 0.75em 1em;
+}
+
+tr.temp-app-group-head.temp-app-group--set td {
+	background: #ecfdf5;
+	border-left-color: #059669;
+	border-right-color: #059669;
+}
+
+tr.temp-app-group-head.temp-app-group--leftover td {
+	background: #fffbeb;
+	border-left-color: #d97706;
+	border-right-color: #d97706;
+}
+
+tr.temp-app-group-head.temp-app-group--other td {
+	background: #f3f4f6;
+	border-left-color: #9ca3af;
+	border-right-color: #9ca3af;
+}
+
+tr.temp-app-group-head .temp-app-group-sub {
+	display: block;
+	font-size: 0.875em;
+	font-weight: 400;
+	margin-top: 0.25em;
+	opacity: 0.9;
+}
+
+tr.temp-app-group-row.temp-app-group--set td:first-child,
+tr.temp-app-group-row.temp-app-group--set td.product-remove {
+	border-left: 3px solid #059669;
+}
+
+tr.temp-app-group-row.temp-app-group--set td:last-child {
+	border-right: 3px solid #059669;
+}
+
+tr.temp-app-group-row.temp-app-group--leftover td:first-child,
+tr.temp-app-group-row.temp-app-group--leftover td.product-remove {
+	border-left: 3px solid #d97706;
+}
+
+tr.temp-app-group-row.temp-app-group--leftover td:last-child {
+	border-right: 3px solid #d97706;
+}
+
+tr.temp-app-group-row.temp-app-group--other td:first-child,
+tr.temp-app-group-row.temp-app-group--other td.product-remove {
+	border-left: 3px solid #9ca3af;
+}
+
+tr.temp-app-group-row.temp-app-group--other td:last-child {
+	border-right: 3px solid #9ca3af;
+}
+
+tr.temp-app-group-row.temp-app-group-last td {
+	border-bottom: 3px solid #9ca3af;
+}
+
+tr.temp-app-group-row.temp-app-group--set.temp-app-group-last td {
+	border-bottom-color: #059669;
+}
+
+tr.temp-app-group-row.temp-app-group--leftover.temp-app-group-last td {
+	border-bottom-color: #d97706;
+}
+
+tr.temp-app-clone {
+	opacity: 0.85;
+}
+
+tr.temp-app-clone td {
+	background: #fafafa;
+}
+
+tr.temp-app-group-spacer td {
+	border: 0;
+	height: 0.5em;
+	padding: 0;
+}
+
+.temp-app-set-qty-badge {
+	display: inline-block;
+	font-size: 0.8em;
+	margin-left: 0.35em;
+	padding: 0.1em 0.45em;
+	vertical-align: middle;
+	background: #e5e7eb;
+	border-radius: 3px;
+	color: #374151;
+}
+
+tr.temp-app-clone .temp-app-set-qty-label {
+	font-size: 0.9em;
+	color: #4b5563;
+}
+
+@media (max-width: 767px) {
+	table.shop_table_responsive tr.temp-app-group-head td {
+		display: block;
+		text-align: left !important;
+	}
+}
