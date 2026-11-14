@@ -124,124 +124,80 @@ final class Temp_App_Cart_Groups {
 			return array( 'groups' => $groups );
 		}
 
-		$bundles = Temp_App_Bundle_Tags::get_bundles();
-		if ( array() === $bundles ) {
-			return array( 'groups' => $groups );
-		}
+		$result = Temp_App_Bundle_Tags::calculate_for_cart( WC()->cart );
+		$deals  = isset( $result['deals'] ) && is_array( $result['deals'] ) ? $result['deals'] : array();
 
-		/** @var array<string,int> $assigned_qty Units already allocated to an earlier bundle (display only). */
-		$assigned_qty = array();
+		/** @var array<string,int> $in_deal_qty Units allocated to a deal (sets or leftover). */
+		$in_deal_qty = array();
 
-		foreach ( $bundles as $bundle ) {
-			$n     = $bundle['qty'];
-			$tag   = $bundle['tag'];
-			$label = $bundle['label'];
-			$price = (float) $bundle['price'];
+		foreach ( $deals as $deal ) {
+			$tag         = isset( $deal['tag'] ) ? (string) $deal['tag'] : '';
+			$label       = isset( $deal['label'] ) ? (string) $deal['label'] : '';
+			$price_cents = isset( $deal['price_cents'] ) ? (int) $deal['price_cents'] : 0;
+			$sets        = isset( $deal['sets'] ) && is_array( $deal['sets'] ) ? $deal['sets'] : array();
+			$need        = isset( $deal['need'] ) ? (int) $deal['need'] : 0;
+			$leftover    = isset( $deal['leftover'] ) && is_array( $deal['leftover'] ) ? $deal['leftover'] : array();
+			$total_sets  = count( $sets );
 
-			/** @var list<array{key:string,qty:int,unit:float}> $blocks */
-			$blocks = array();
+			foreach ( $sets as $set ) {
+				$saving_cents  = isset( $set['saving_cents'] ) ? (int) $set['saving_cents'] : 0;
+				$regular_cents = isset( $set['regular_cents'] ) ? (int) $set['regular_cents'] : 0;
+				$index         = isset( $set['index'] ) ? (int) $set['index'] : 0;
+				$raw_items     = isset( $set['items'] ) && is_array( $set['items'] ) ? $set['items'] : array();
+				$items         = self::items_for_display( $raw_items );
 
-			// Same basis as Temp_App_Bundle_Tags::apply_bundle_discount(): average regular price of all eligible units.
-			$all_qty = 0;
-			$all_sum = 0.0;
-
-			foreach ( WC()->cart->get_cart() as $cart_item_key => $item ) {
-				$product_id = isset( $item['product_id'] ) ? (int) $item['product_id'] : 0;
-				$line_qty   = isset( $item['quantity'] ) ? (int) $item['quantity'] : 0;
-				if ( $product_id <= 0 || $line_qty < 1 ) {
-					continue;
-				}
-				if ( ! Temp_App_Bundle_Tags::product_eligible_for_mix( $product_id, $tag ) ) {
-					continue;
-				}
-
-				if ( empty( $item['data'] ) || ! $item['data'] instanceof WC_Product ) {
-					continue;
-				}
-
-				$regular = (float) $item['data']->get_regular_price();
-				if ( $regular <= 0 ) {
-					$regular = (float) $item['data']->get_price();
-				}
-				$all_qty += $line_qty;
-				$all_sum += $regular * $line_qty;
-
-				$used      = $assigned_qty[ $cart_item_key ] ?? 0;
-				$remaining = $line_qty - $used;
-				if ( $remaining < 1 ) {
-					continue;
-				}
-
-				$blocks[] = array(
-					'key'  => $cart_item_key,
-					'qty'  => $remaining,
-					'unit' => $regular,
-				);
-			}
-
-			if ( array() === $blocks ) {
-				continue;
-			}
-
-			$pool_qty = 0;
-			foreach ( $blocks as $block ) {
-				$pool_qty += $block['qty'];
-			}
-
-			$total_sets = intdiv( $pool_qty, $n );
-			$unit_avg   = $all_qty > 0 ? ( $all_sum / $all_qty ) : 0.0;
-			// Per-set share of the cart fee, so the headings add up to the discount line in the totals.
-			$saves = max( 0.0, round( $unit_avg * $n - $price, wc_get_price_decimals() ) );
-
-			for ( $set_index = 1; $set_index <= $total_sets; $set_index++ ) {
-				$taken = self::take_units_from_blocks( $blocks, $n );
-				if ( $taken['qty'] < 1 ) {
-					break;
-				}
-
-				$groups[] = array(
-					'id'         => $tag . '-' . $set_index,
-					'type'       => 'set',
-					'heading'    => sprintf(
-						/* translators: 1: deal label 2: set index 3: total sets */
-						__( '%1$s — Set %2$d of %3$d', 'temp-app' ),
-						$label,
-						$set_index,
-						$total_sets
-					),
-					'subheading' => sprintf(
-						/* translators: 1: saving 2: deal price */
-						__( 'Saves %1$s on this set (deal price %2$s)', 'temp-app' ),
-						self::format_plain_price( $saves ),
-						self::format_plain_price( $price )
-					),
-					'items'      => $taken['items'],
-					'saves'      => $saves,
-				);
-
-				self::mark_assigned( $assigned_qty, $taken['items'] );
-			}
-
-			$leftover_qty = 0;
-			foreach ( $blocks as $block ) {
-				$leftover_qty += $block['qty'];
-			}
-
-			if ( $leftover_qty > 0 ) {
-				$left_items = array();
-				foreach ( $blocks as $block ) {
-					if ( $block['qty'] < 1 ) {
-						continue;
+				foreach ( $items as $row ) {
+					$key = $row['key'];
+					if ( ! isset( $in_deal_qty[ $key ] ) ) {
+						$in_deal_qty[ $key ] = 0;
 					}
-					$left_items[] = array(
-						'key' => $block['key'],
-						'qty' => $block['qty'],
+					$in_deal_qty[ $key ] += (int) $row['qty'];
+				}
+
+				$saves = $saving_cents / 100;
+
+				if ( $saving_cents > 0 ) {
+					$subheading = sprintf(
+						/* translators: 1: saving 2: regular total 3: deal price */
+						__( 'Saves %1$s on this set (regular %2$s, deal price %3$s)', 'temp-app' ),
+						self::format_plain_price( $saves ),
+						self::format_plain_price( $regular_cents / 100 ),
+						self::format_plain_price( $price_cents / 100 )
+					);
+				} else {
+					$subheading = sprintf(
+						/* translators: 1: regular total 2: deal price */
+						__( 'No saving on this set (regular %1$s is already at or below the deal price %2$s)', 'temp-app' ),
+						self::format_plain_price( $regular_cents / 100 ),
+						self::format_plain_price( $price_cents / 100 )
 					);
 				}
 
-				$need = $n - $leftover_qty;
-				if ( $need < 1 ) {
-					$need = 0;
+				$groups[] = array(
+					'id'            => $tag . '-' . $index,
+					'type'          => 'set',
+					'heading'       => sprintf(
+						/* translators: 1: deal label 2: set index 3: total sets */
+						__( '%1$s — Set %2$d of %3$d', 'temp-app' ),
+						$label,
+						$index,
+						$total_sets
+					),
+					'subheading'    => $subheading,
+					'items'         => $items,
+					'saves'         => $saves,
+					'saving_cents'  => $saving_cents,
+				);
+			}
+
+			if ( array() !== $leftover ) {
+				$left_items = self::items_for_display( $leftover );
+				foreach ( $left_items as $row ) {
+					$key = $row['key'];
+					if ( ! isset( $in_deal_qty[ $key ] ) ) {
+						$in_deal_qty[ $key ] = 0;
+					}
+					$in_deal_qty[ $key ] += (int) $row['qty'];
 				}
 
 				$groups[] = array(
@@ -260,10 +216,13 @@ final class Temp_App_Cart_Groups {
 					'items'      => $left_items,
 					'need'       => $need,
 				);
-
-				self::mark_assigned( $assigned_qty, $left_items );
 			}
 		}
+
+		$unassigned = isset( $result['unassigned_keys'] ) && is_array( $result['unassigned_keys'] )
+			? $result['unassigned_keys']
+			: array();
+		$unassigned_map = array_fill_keys( $unassigned, true );
 
 		$other_items = array();
 		foreach ( WC()->cart->get_cart() as $cart_item_key => $item ) {
@@ -271,12 +230,22 @@ final class Temp_App_Cart_Groups {
 			if ( $line_qty < 1 ) {
 				continue;
 			}
-			$used       = $assigned_qty[ $cart_item_key ] ?? 0;
-			$unassigned = $line_qty - $used;
-			if ( $unassigned > 0 ) {
+			$key = (string) $cart_item_key;
+
+			if ( isset( $unassigned_map[ $key ] ) ) {
 				$other_items[] = array(
-					'key' => $cart_item_key,
-					'qty' => $unassigned,
+					'key' => $key,
+					'qty' => $line_qty,
+				);
+				continue;
+			}
+
+			$used       = $in_deal_qty[ $key ] ?? 0;
+			$unassigned_units = $line_qty - $used;
+			if ( $unassigned_units > 0 ) {
+				$other_items[] = array(
+					'key' => $key,
+					'qty' => $unassigned_units,
 				);
 			}
 		}
@@ -295,65 +264,20 @@ final class Temp_App_Cart_Groups {
 	}
 
 	/**
-	 * @param list<array{key:string,qty:int,unit:float}> $blocks Mutable blocks.
-	 * @param int                                         $take   Units to take.
-	 * @return array{qty:int,regular_sum:float,items:list<array{key:string,qty:int}>}
+	 * Strip calculator-only fields from set / leftover item rows.
+	 *
+	 * @param list<array{key:string,qty:int,product_id?:int,unit_price_cents?:int}> $raw Items.
+	 * @return list<array{key:string,qty:int}>
 	 */
-	private static function take_units_from_blocks( array &$blocks, int $take ): array {
-		$need         = $take;
-		$regular_sum  = 0.0;
-		$qty_taken    = 0;
-		$items_by_key = array();
-
-		foreach ( $blocks as &$block ) {
-			if ( $need < 1 ) {
-				break;
-			}
-			if ( $block['qty'] < 1 ) {
-				continue;
-			}
-			$slice = min( $block['qty'], $need );
-			$key   = $block['key'];
-
-			if ( ! isset( $items_by_key[ $key ] ) ) {
-				$items_by_key[ $key ] = 0;
-			}
-			$items_by_key[ $key ] += $slice;
-
-			$regular_sum += $block['unit'] * $slice;
-			$qty_taken   += $slice;
-			$block['qty'] -= $slice;
-			$need        -= $slice;
-		}
-		unset( $block );
-
-		$items = array();
-		foreach ( $items_by_key as $key => $qty ) {
-			$items[] = array(
-				'key' => $key,
-				'qty' => $qty,
+	private static function items_for_display( array $raw ): array {
+		$out = array();
+		foreach ( $raw as $row ) {
+			$out[] = array(
+				'key' => (string) $row['key'],
+				'qty' => (int) $row['qty'],
 			);
 		}
-
-		return array(
-			'qty'          => $qty_taken,
-			'regular_sum'  => $regular_sum,
-			'items'        => $items,
-		);
-	}
-
-	/**
-	 * @param array<string,int>                          $assigned_qty Assigned quantities map.
-	 * @param list<array{key:string,qty:int}> $items        Items to mark.
-	 */
-	private static function mark_assigned( array &$assigned_qty, array $items ): void {
-		foreach ( $items as $row ) {
-			$key = $row['key'];
-			if ( ! isset( $assigned_qty[ $key ] ) ) {
-				$assigned_qty[ $key ] = 0;
-			}
-			$assigned_qty[ $key ] += (int) $row['qty'];
-		}
+		return $out;
 	}
 
 	private static function format_plain_price( float $amount ): string {

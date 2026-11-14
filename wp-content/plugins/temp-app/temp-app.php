@@ -23,6 +23,7 @@ define( 'TEMP_APP_FILE', __FILE__ );
 define( 'TEMP_APP_PATH', plugin_dir_path( __FILE__ ) );
 
 require_once TEMP_APP_PATH . 'includes/class-temp-app-volume-pricing.php';
+require_once TEMP_APP_PATH . 'includes/class-temp-app-deal-calculator.php';
 require_once TEMP_APP_PATH . 'includes/class-temp-app-bundle-tags.php';
 require_once TEMP_APP_PATH . 'includes/class-temp-app-cart-groups.php';
 require_once TEMP_APP_PATH . 'includes/class-temp-app-admin.php';
