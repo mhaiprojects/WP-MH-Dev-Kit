@@ -10,7 +10,7 @@ Subdomain network on `*.cursor-wpdev2.ddev.site`. Multisite constants live in `w
 | 2 | `adamat` | https://adamat.cursor-wpdev2.ddev.site | adamat client showcase (Divi) |
 | 3 | `divi-demo` | https://divi-demo.cursor-wpdev2.ddev.site | Divi builder + WooCommerce grocery demo (20 products) |
 | 4 | `cafe-takeaway` | https://cafe-takeaway.cursor-wpdev2.ddev.site | Riverbank Cafe & Takeaway (Shepparton-style) |
-| 5 | `factory-sales` | https://factory-sales.cursor-wpdev2.ddev.site | Goulburn Factory Sales B2C outlet + TempApp package pricing |
+| 5 | `factory-sales` | https://factory-sales.cursor-wpdev2.ddev.site | Goulburn Factory Sales B2C outlet + Mix and Match Bundle package pricing |
 | 6 | `hospitality-supplies` | https://hospitality-supplies.cursor-wpdev2.ddev.site | GV Hospitality Supplies B2B catalogue |
 
 ## Rules

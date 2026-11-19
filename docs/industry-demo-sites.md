@@ -19,7 +19,7 @@ PoC walkthrough: https://factory-sales.cursor-wpdev2.ddev.site/demo-guide/
 
 ## Pricing (verified)
 
-TempApp (`wp-content/plugins/temp-app/`):
+Mix and Match Bundle (`wp-content/plugins/mix-and-match-bundle/`, own repo [mhaiprojects/Mix-and-Match-Bundle](https://github.com/mhaiprojects/Mix-and-Match-Bundle)):
 
 | Feature | How to demo | Expected |
 |---------|-------------|----------|
@@ -61,7 +61,7 @@ ddev wp option update woocommerce_coming_soon no --url=https://factory-sales.cur
 1. Replace picsum placeholders with real photos.
 2. Polish Divi layouts in Visual Builder (dark-section text contrast).
 3. Add product featured images.
-4. Replace TempApp with a maintained dynamic-pricing plugin before client go-live.
+4. Review the Mix and Match Bundle plugin (formerly TempApp) for production readiness before client go-live.
 5. Hospitality “Quote” is still a contact form — not a full quote-cart system.
 6. AU GST tax classes / shipping zones if you need production-like checkout.
 7. External brand names are illustrative only — fictionalise further before sharing publicly.

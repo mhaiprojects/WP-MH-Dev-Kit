@@ -22,7 +22,7 @@ create_and_seed() {
   ddev wp option update siteurl "${url}" --url="${url}"
   ddev wp theme activate Divi --url="${url}"
   ddev wp plugin activate woocommerce --url="${url}"
-  ddev wp plugin activate temp-app --url="${url}" || true
+  ddev wp plugin activate mix-and-match-bundle --url="${url}" || true
 
   ddev wp option update woocommerce_store_city "Shepparton" --url="${url}"
   ddev wp option update woocommerce_default_country "AU:VIC" --url="${url}"

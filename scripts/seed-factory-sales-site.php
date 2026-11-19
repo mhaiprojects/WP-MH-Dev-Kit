@@ -1,7 +1,7 @@
 <?php
 /**
  * Seed factory-sales subsite: B2C factory outlet style (SPC Factory Sales inspired).
- * Includes TempApp quantity packages and buy-any-N tag deals.
+ * Includes Mix and Match Bundle quantity packages and buy-any-N tag deals.
  *
  * @package IndustryDemos
  */
@@ -25,9 +25,9 @@ $cat_drinks  = IndustryDemoHelpers::ensure_product_cat( 'drinks-juice', 'Drinks 
 $tag_any3 = IndustryDemoHelpers::ensure_product_tag( 'deal-any-3', 'Deal: Any 3 for $7' );
 $tag_any4 = IndustryDemoHelpers::ensure_product_tag( 'deal-any-4', 'Deal: Any 4 for $5' );
 
-// Configure TempApp tag bundles (requires TempApp active).
-if ( class_exists( 'Temp_App_Bundle_Tags' ) ) {
-	Temp_App_Bundle_Tags::save_bundles(
+// Configure Mix and Match Bundle tag bundles (requires Mix and Match Bundle active).
+if ( class_exists( 'MMB_Bundle_Tags' ) ) {
+	MMB_Bundle_Tags::save_bundles(
 		array(
 			array(
 				'tag'   => 'deal-any-3',
@@ -43,9 +43,9 @@ if ( class_exists( 'Temp_App_Bundle_Tags' ) ) {
 			),
 		)
 	);
-	WP_CLI::log( 'TempApp tag bundles configured.' );
+	WP_CLI::log( 'Mix and Match Bundle tag bundles configured.' );
 } else {
-	WP_CLI::warning( 'TempApp not active — tag bundles skipped. Activate temp-app and re-run seed.' );
+	WP_CLI::warning( 'Mix and Match Bundle not active — tag bundles skipped. Activate mix-and-match-bundle and re-run seed.' );
 }
 
 $products = array(
@@ -242,7 +242,7 @@ $home = IndustryDemoHelpers::section(
 			'1_3',
 			IndustryDemoHelpers::blurb(
 				'Package pricing',
-				'Buy 1 for $10, buy 2 for $15 — volume breaks on selected lines (TempApp).',
+				'Buy 1 for $10, buy 2 for $15 — volume breaks on selected lines (Mix and Match Bundle).',
 				array( 'use_icon' => 'on', 'font_icon' => '&#xe0f0;', 'icon_color' => '#b45309' )
 			)
 		) .
@@ -310,7 +310,7 @@ $about = IndustryDemoHelpers::section(
 		IndustryDemoHelpers::column(
 			'4_4',
 			IndustryDemoHelpers::text(
-				'<h1>About Goulburn Factory Sales</h1><p>Demo B2C outlet inspired by Shepparton factory sales experiences — bargain grocery, tinned fruit, and pantry multi-buys.</p><p>Not affiliated with SPC Factory Sales. Product names are illustrative for WooCommerce demos.</p><p>Pricing tech lives in the <strong>TempApp</strong> plugin (quantity packages + tag bundles).</p>'
+				'<h1>About Goulburn Factory Sales</h1><p>Demo B2C outlet inspired by Shepparton factory sales experiences — bargain grocery, tinned fruit, and pantry multi-buys.</p><p>Not affiliated with SPC Factory Sales. Product names are illustrative for WooCommerce demos.</p><p>Pricing tech lives in the <strong>Mix and Match Bundle</strong> plugin (quantity packages + tag bundles).</p>'
 			)
 		)
 	)

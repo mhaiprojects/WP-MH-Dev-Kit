@@ -1,6 +1,6 @@
 <?php
 /**
- * Verify TempApp qty packages + mix & match on factory-sales.
+ * Verify Mix and Match Bundle qty packages + mix & match on factory-sales.
  *
  * Usage:
  *   ddev wp eval-file scripts/verify-industry-demo-pricing.php --url=https://factory-sales.cursor-wpdev2.ddev.site
@@ -17,14 +17,14 @@ if ( 'factory-sales.cursor-wpdev2.ddev.site' !== $host ) {
 	WP_CLI::error( 'Run against factory-sales only.' );
 }
 
-if ( ! class_exists( 'Temp_App_Volume_Pricing' ) || ! class_exists( 'Temp_App_Bundle_Tags' ) ) {
-	WP_CLI::error( 'TempApp not loaded.' );
+if ( ! class_exists( 'MMB_Volume_Pricing' ) || ! class_exists( 'MMB_Bundle_Tags' ) ) {
+	WP_CLI::error( 'Mix and Match Bundle not loaded.' );
 }
 
 /**
  * @param list<array{0:string,1:int}> $items SKU + qty.
  */
-function temp_app_verify_cart( array $items ): float {
+function mmb_verify_cart( array $items ): float {
 	WC()->cart->empty_cart();
 	foreach ( $items as $row ) {
 		$id = wc_get_product_id_by_sku( $row[0] );
@@ -54,7 +54,7 @@ $cases    = array(
 
 foreach ( $cases as $case ) {
 	[ $label, $items, $expect ] = $case;
-	$total = temp_app_verify_cart( $items );
+	$total = mmb_verify_cart( $items );
 	$ok    = abs( $total - $expect ) < 0.05;
 	if ( ! $ok ) {
 		++$failures;

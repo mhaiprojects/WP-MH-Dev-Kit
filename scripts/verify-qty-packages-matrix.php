@@ -1,6 +1,6 @@
 <?php
 /**
- * Exhaustive qty-package matrix for all products with TempApp breaks.
+ * Exhaustive qty-package matrix for all products with Mix and Match Bundle breaks.
  *
  * Usage:
  *   ddev wp eval-file scripts/verify-qty-packages-matrix.php --url=https://factory-sales.cursor-wpdev2.ddev.site
@@ -12,8 +12,8 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-if ( ! class_exists( 'Temp_App_Volume_Pricing' ) ) {
-	WP_CLI::error( 'TempApp volume pricing not loaded.' );
+if ( ! class_exists( 'MMB_Volume_Pricing' ) ) {
+	WP_CLI::error( 'Mix and Match Bundle volume pricing not loaded.' );
 }
 
 /**
@@ -21,7 +21,7 @@ if ( ! class_exists( 'Temp_App_Volume_Pricing' ) ) {
  *
  * @param list<array{qty:int,price:float}> $breaks Breaks.
  */
-function temp_app_expected_total( array $breaks, int $qty, float $fallback ): float {
+function mmb_expected_total( array $breaks, int $qty, float $fallback ): float {
 	if ( $qty < 1 ) {
 		return 0.0;
 	}
@@ -76,7 +76,7 @@ foreach ( $products as $product ) {
 		continue;
 	}
 	$pid    = $product->get_id();
-	$breaks = Temp_App_Volume_Pricing::get_breaks( $pid );
+	$breaks = MMB_Volume_Pricing::get_breaks( $pid );
 	if ( array() === $breaks ) {
 		continue;
 	}
@@ -89,8 +89,8 @@ foreach ( $products as $product ) {
 	WP_CLI::log( sprintf( '--- %s (%s) breaks=%s ---', $product->get_name(), $sku, wp_json_encode( $breaks ) ) );
 
 	for ( $qty = 1; $qty <= $max_qty; $qty++ ) {
-		$expect = temp_app_expected_total( $breaks, $qty, $fallback );
-		$got_fn = Temp_App_Volume_Pricing::package_total_for_qty( $pid, $qty, $fallback );
+		$expect = mmb_expected_total( $breaks, $qty, $fallback );
+		$got_fn = MMB_Volume_Pricing::package_total_for_qty( $pid, $qty, $fallback );
 
 		WC()->cart->empty_cart();
 		WC()->cart->add_to_cart( $pid, $qty );
@@ -110,7 +110,7 @@ foreach ( $products as $product ) {
 	for ( $qty = 1; $qty <= min( 10, $max_qty ); $qty++ ) {
 		WC()->cart->set_quantity( $key, $qty, true );
 		WC()->cart->calculate_totals();
-		$expect   = temp_app_expected_total( $breaks, $qty, $fallback );
+		$expect   = mmb_expected_total( $breaks, $qty, $fallback );
 		$got_cart = round( (float) WC()->cart->get_total( 'edit' ), 2 );
 		++$checked;
 		if ( abs( $got_cart - $expect ) > 0.02 ) {
@@ -125,7 +125,7 @@ foreach ( $products as $product ) {
 		WC()->cart->add_to_cart( $pid, 1 );
 		WC()->cart->add_to_cart( $pid, 1 );
 		WC()->cart->calculate_totals();
-		$expect   = temp_app_expected_total( $breaks, 2, $fallback );
+		$expect   = mmb_expected_total( $breaks, 2, $fallback );
 		$got_cart = round( (float) WC()->cart->get_total( 'edit' ), 2 );
 		++$checked;
 		if ( abs( $got_cart - $expect ) > 0.02 ) {
@@ -140,7 +140,7 @@ foreach ( $products as $product ) {
 // Synthetic edge combos (temporary meta on sauce product).
 $sauce_id = wc_get_product_id_by_sku( 'FS-SAUCE-VP' );
 if ( $sauce_id ) {
-	$original = get_post_meta( $sauce_id, Temp_App_Volume_Pricing::META_KEY, true );
+	$original = get_post_meta( $sauce_id, MMB_Volume_Pricing::META_KEY, true );
 	$edges    = array(
 		'only-2'           => array( array( 'qty' => 2, 'price' => 15.0 ) ),
 		'1-and-3'          => array( array( 'qty' => 1, 'price' => 10.0 ), array( 'qty' => 3, 'price' => 24.0 ) ),
@@ -150,10 +150,10 @@ if ( $sauce_id ) {
 	);
 
 	foreach ( $edges as $label => $breaks ) {
-		update_post_meta( $sauce_id, Temp_App_Volume_Pricing::META_KEY, $breaks );
+		update_post_meta( $sauce_id, MMB_Volume_Pricing::META_KEY, $breaks );
 		WP_CLI::log( '--- edge case: ' . $label . ' ---' );
 		for ( $qty = 1; $qty <= 12; $qty++ ) {
-			$expect = temp_app_expected_total( $breaks, $qty, 10.0 );
+			$expect = mmb_expected_total( $breaks, $qty, 10.0 );
 			WC()->cart->empty_cart();
 			WC()->cart->add_to_cart( $sauce_id, $qty );
 			WC()->cart->calculate_totals();
@@ -165,7 +165,7 @@ if ( $sauce_id ) {
 			}
 		}
 	}
-	update_post_meta( $sauce_id, Temp_App_Volume_Pricing::META_KEY, $original );
+	update_post_meta( $sauce_id, MMB_Volume_Pricing::META_KEY, $original );
 }
 
 WC()->cart->empty_cart();
