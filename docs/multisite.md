@@ -9,6 +9,9 @@ Subdomain network on `*.cursor-wpdev2.ddev.site`. Multisite constants live in `w
 | 1 | *(main)* | https://cursor-wpdev2.ddev.site | Plugin dev, WooCommerce, mh-dev-kit module demos — **keep clean** |
 | 2 | `adamat` | https://adamat.cursor-wpdev2.ddev.site | adamat client showcase (Divi) |
 | 3 | `divi-demo` | https://divi-demo.cursor-wpdev2.ddev.site | Divi builder + WooCommerce grocery demo (20 products) |
+| 4 | `cafe-takeaway` | https://cafe-takeaway.cursor-wpdev2.ddev.site | Riverbank Cafe & Takeaway (Shepparton-style) |
+| 5 | `factory-sales` | https://factory-sales.cursor-wpdev2.ddev.site | Goulburn Factory Sales B2C outlet + TempApp package pricing |
+| 6 | `hospitality-supplies` | https://hospitality-supplies.cursor-wpdev2.ddev.site | GV Hospitality Supplies B2B catalogue |
 
 ## Rules
 
@@ -36,6 +39,7 @@ Subdomain network on `*.cursor-wpdev2.ddev.site`. Multisite constants live in `w
 | Ensure wp-config | `bash scripts/ensure-multisite-wp-config.sh` |
 | Divi demo subsite | `./scripts/setup-divi-demo-multisite.sh` |
 | adamat subsite | `./scripts/setup-adamat-multisite.sh` |
+| Industry demos (3 sites) | `./scripts/setup-industry-demo-sites.sh` |
 | Clean demo from main | `ddev wp eval-file scripts/cleanup-main-site-divi-demo.php --url=https://cursor-wpdev2.ddev.site` |
 | Network admin | https://cursor-wpdev2.ddev.site/wp-admin/network/ |
 
