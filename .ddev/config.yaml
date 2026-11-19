@@ -14,6 +14,9 @@ use_dns_when_possible: true
 composer_version: "2"
 web_environment:
     - WP_ENVIRONMENT_TYPE=local
-hooks:
-    post-start:
-        - exec-host: bash scripts/ensure-multisite-wp-config.sh
+# Disabled 2026-11-19 at Michael's request: stop re-adding the multisite require on every start.
+# hooks:
+#     post-start:
+#         - exec-host: bash scripts/ensure-multisite-wp-config.sh
+# Added 2026-11-19: DDEV stops rewriting wp-config.php, so the multisite require stays without a start hook.
+disable_settings_management: true
