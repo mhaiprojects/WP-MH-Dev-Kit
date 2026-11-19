@@ -61,7 +61,7 @@ ddev wp option update woocommerce_coming_soon no --url=https://factory-sales.cur
 1. Replace picsum placeholders with real photos.
 2. Polish Divi layouts in Visual Builder (dark-section text contrast).
 3. Add product featured images.
-4. Review the Mix and Match Bundle plugin (formerly TempApp) for production readiness before client go-live.
+4. Review the Mix and Match Bundle plugin for production readiness before client go-live.
 5. Hospitality “Quote” is still a contact form — not a full quote-cart system.
 6. AU GST tax classes / shipping zones if you need production-like checkout.
 7. External brand names are illustrative only — fictionalise further before sharing publicly.

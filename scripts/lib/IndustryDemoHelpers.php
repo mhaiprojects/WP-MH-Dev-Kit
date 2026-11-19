@@ -300,9 +300,9 @@ final class IndustryDemoHelpers {
 		}
 
 		if ( ! empty( $data['qty_breaks'] ) && is_array( $data['qty_breaks'] ) ) {
-			update_post_meta( $product_id, '_temp_app_qty_breaks', $data['qty_breaks'] );
+			update_post_meta( $product_id, '_mmb_qty_breaks', $data['qty_breaks'] );
 		} else {
-			delete_post_meta( $product_id, '_temp_app_qty_breaks' );
+			delete_post_meta( $product_id, '_mmb_qty_breaks' );
 		}
 
 		if ( ! empty( $data['meta'] ) && is_array( $data['meta'] ) ) {
