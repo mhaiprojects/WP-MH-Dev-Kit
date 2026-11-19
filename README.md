@@ -1,6 +1,6 @@
-# Cursor WP Dev 2
+# WP-MH-Dev-Kit
 
-Local WordPress development environment powered by [DDEV](https://docs.ddev.com/).
+WP-MH-Dev-Kit (formerly WP-Dev2 / WP-Plugin-MH-Dev-Kit) is a local WordPress development environment powered by [DDEV](https://docs.ddev.com/).
 
 ## Quick start
 
