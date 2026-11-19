@@ -41,6 +41,16 @@ final class ApiMiddlewareRestPresenter {
 				'permission_callback' => array( $this, 'can_manage' ),
 			)
 		);
+
+		register_rest_route(
+			'mhdk/v1',
+			'/api-connections/test',
+			array(
+				'methods'             => \WP_REST_Server::CREATABLE,
+				'callback'            => array( $this, 'test_connection' ),
+				'permission_callback' => array( $this, 'can_manage' ),
+			)
+		);
 	}
 
 	public function can_manage(): bool {
@@ -65,6 +75,18 @@ final class ApiMiddlewareRestPresenter {
 
 	public function run_connection( \WP_REST_Request $request ): \WP_REST_Response {
 		$result = $this->model->run_connection( (string) $request->get_param( 'id' ) );
+
+		return new \WP_REST_Response( $result, ! empty( $result['success'] ) ? 200 : 500 );
+	}
+
+	public function test_connection( \WP_REST_Request $request ): \WP_REST_Response {
+		$params = $request->get_json_params();
+
+		if ( ! is_array( $params ) ) {
+			$params = $request->get_params();
+		}
+
+		$result = $this->model->test_connection( is_array( $params ) ? $params : array() );
 
 		return new \WP_REST_Response( $result, ! empty( $result['success'] ) ? 200 : 500 );
 	}

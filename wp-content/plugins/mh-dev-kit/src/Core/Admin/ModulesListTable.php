@@ -36,10 +36,11 @@ final class ModulesListTable extends \WP_List_Table {
 
 	public function get_columns(): array {
 		return array(
-			'name'        => __( 'Module', 'mh-dev-kit' ),
-			'description' => __( 'Description', 'mh-dev-kit' ),
-			'status'      => __( 'Status', 'mh-dev-kit' ),
-			'enabled'     => __( 'Enabled', 'mh-dev-kit' ),
+			'name'           => __( 'Module', 'mh-dev-kit' ),
+			'description'    => __( 'Description', 'mh-dev-kit' ),
+			'dependencies'   => __( 'Dependencies', 'mh-dev-kit' ),
+			'status'         => __( 'Status', 'mh-dev-kit' ),
+			'enabled'        => __( 'Enabled', 'mh-dev-kit' ),
 		);
 	}
 
@@ -68,6 +69,67 @@ final class ModulesListTable extends \WP_List_Table {
 	 */
 	public function column_description( array $item ): string {
 		return esc_html( (string) $item['description'] );
+	}
+
+	/**
+	 * @param array<string, mixed> $item Module row.
+	 */
+	public function column_dependencies( array $item ): string {
+		$lines = array();
+
+		if ( ! empty( $item['required_modules'] ) ) {
+			foreach ( (array) $item['required_modules'] as $dep ) {
+				if ( ! is_array( $dep ) ) {
+					continue;
+				}
+
+				$label   = (string) ( $dep['name'] ?? $dep['id'] ?? '' );
+				$enabled = ! empty( $dep['enabled'] );
+				$icon    = $enabled ? 'dashicons-yes' : 'dashicons-warning';
+
+				$lines[] = sprintf(
+					'<span class="dashicons %1$s" aria-hidden="true"></span> %2$s',
+					esc_attr( $icon ),
+					esc_html(
+						$enabled
+							/* translators: %s: module name */
+							? sprintf( __( 'Requires %s', 'mh-dev-kit' ), $label )
+							/* translators: %s: module name */
+							: sprintf( __( 'Requires %s (disabled)', 'mh-dev-kit' ), $label )
+					)
+				);
+			}
+		}
+
+		if ( ! empty( $item['required_plugins'] ) ) {
+			foreach ( (array) $item['required_plugins'] as $plugin ) {
+				$lines[] = '<span class="dashicons dashicons-admin-plugins" aria-hidden="true"></span> ' . esc_html(
+					sprintf(
+						/* translators: %s: plugin basename */
+						__( 'Plugin: %s', 'mh-dev-kit' ),
+						(string) $plugin
+					)
+				);
+			}
+		}
+
+		if ( ! empty( $item['dependents'] ) ) {
+			foreach ( (array) $item['dependents'] as $dependent ) {
+				$lines[] = '<span class="dashicons dashicons-networking" aria-hidden="true"></span> ' . esc_html(
+					sprintf(
+						/* translators: %s: module name */
+						__( 'Required by %s', 'mh-dev-kit' ),
+						(string) $dependent
+					)
+				);
+			}
+		}
+
+		if ( array() === $lines ) {
+			return '<span class="description">' . esc_html__( 'None', 'mh-dev-kit' ) . '</span>';
+		}
+
+		return implode( '<br />', $lines );
 	}
 
 	/**
@@ -103,11 +165,16 @@ final class ModulesListTable extends \WP_List_Table {
 		$id      = (string) $item['id'];
 		$enabled = ! empty( $this->settings[ $id ]['enabled'] );
 		$name    = $this->option_key . '[' . $id . '][enabled]';
+		$met     = ! empty( $item['requirements_met'] );
+		$deps_ok = empty( $item['module_dependencies_met'] ) ? true : ! empty( $item['module_dependencies_met'] );
+
+		$disabled_attr = ( $met && $deps_ok ) ? '' : ' disabled="disabled"';
 
 		return sprintf(
-			'<label><input type="checkbox" name="%1$s" value="1" %2$s /> %3$s</label>',
+			'<label><input type="checkbox" name="%1$s" value="1" %2$s%3$s /> %4$s</label>',
 			esc_attr( $name ),
 			checked( $enabled, true, false ),
+			$disabled_attr,
 			esc_html__( 'Enabled', 'mh-dev-kit' )
 		);
 	}

@@ -24,6 +24,8 @@ final class StoreLocatorSettingsPresenter {
 
 	public function register(): void {
 		add_action( 'admin_init', array( $this, 'register_settings' ) );
+		add_action( 'admin_post_mhdk_save_stores', array( $this, 'handle_save_stores' ) );
+		add_action( 'admin_post_mhdk_reset_stores', array( $this, 'handle_reset_stores' ) );
 	}
 
 	public function register_settings(): void {
@@ -83,20 +85,66 @@ final class StoreLocatorSettingsPresenter {
 		ViewRenderer::display(
 			'Modules/Commerce/Features/StoreLocator/Views/settings-page.php',
 			array(
-				'settings' => $this->settings,
-				'stores'   => $this->stores->get_all(),
+				'settings'     => $this->settings,
+				'stores_model' => $this->stores,
+				'stores'       => $this->stores->get_all(),
 			)
 		);
 	}
 
-	public function field_max_distance(): void {
-		$key = StoreLocatorSettingsModel::OPTION_KEY;
-		printf(
-			'<input type="number" min="1" class="small-text" name="%1$s" value="%2$d" />',
-			esc_attr( $key . '[max_distance_km]' ),
-			(int) $this->settings->get( 'max_distance_km', 500 )
+	public function handle_save_stores(): void {
+		if ( ! current_user_can( 'manage_woocommerce' ) ) {
+			wp_die( esc_html__( 'Unauthorized', 'mh-dev-kit' ) );
+		}
+
+		check_admin_referer( 'mhdk_save_stores' );
+
+		$raw = isset( $_POST['stores'] ) && is_array( $_POST['stores'] )
+			? wp_unslash( $_POST['stores'] )
+			: array();
+
+		$stores = array();
+
+		foreach ( $raw as $row ) {
+			if ( ! is_array( $row ) ) {
+				continue;
+			}
+
+			$row['active'] = ! empty( $row['active'] );
+			$stores[]      = $row;
+		}
+
+		$this->stores->save_stores( $stores );
+
+		wp_safe_redirect(
+			admin_url( 'admin.php?page=' . StoreLocatorSettingsModel::SETTINGS_SLUG . '&stores_saved=1' )
 		);
-		echo '<p class="description">' . esc_html__( 'Stores beyond this radius are hidden from nearby results.', 'mh-dev-kit' ) . '</p>';
+		exit;
+	}
+
+	public function handle_reset_stores(): void {
+		if ( ! current_user_can( 'manage_woocommerce' ) ) {
+			wp_die( esc_html__( 'Unauthorized', 'mh-dev-kit' ) );
+		}
+
+		check_admin_referer( 'mhdk_reset_stores' );
+
+		$this->stores->reset_to_defaults();
+
+		wp_safe_redirect(
+			admin_url( 'admin.php?page=' . StoreLocatorSettingsModel::SETTINGS_SLUG . '&stores_reset=1' )
+		);
+		exit;
+	}
+
+	public function field_max_distance(): void {
+		SettingsFieldRenderer::number(
+			StoreLocatorSettingsModel::OPTION_KEY . '[max_distance_km]',
+			(int) $this->settings->get( 'max_distance_km', 500 ),
+			1,
+			5000,
+			__( 'Stores outside this radius are shown as outside the delivery area on the locator.', 'mh-dev-kit' )
+		);
 	}
 
 	public function field_checkout(): void {

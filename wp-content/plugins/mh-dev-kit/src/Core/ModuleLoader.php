@@ -61,7 +61,12 @@ final class ModuleLoader {
 			$req    = $module->requirements();
 
 			if ( ! $req->met() ) {
-				self::register_requirements_notice( $class::name(), $req );
+				self::register_requirements_notice( $class::name(), $req->unmet_messages() );
+				continue;
+			}
+
+			if ( ! $req->module_dependencies_met( $settings, self::module_classes() ) ) {
+				self::register_requirements_notice( $class::name(), $req->unmet_module_messages( $settings, self::module_classes() ) );
 				continue;
 			}
 
@@ -73,9 +78,7 @@ final class ModuleLoader {
 		}
 	}
 
-	private static function register_requirements_notice( string $module_name, ModuleRequirements $req ): void {
-		$messages = $req->unmet_messages();
-
+	private static function register_requirements_notice( string $module_name, array $messages ): void {
 		if ( array() === $messages ) {
 			return;
 		}

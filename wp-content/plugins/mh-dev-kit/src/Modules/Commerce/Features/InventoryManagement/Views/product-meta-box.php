@@ -5,6 +5,7 @@
  * @var array<int, array<string, mixed>> $stores
  * @var array<string, int>               $levels
  * @var int                              $product_id
+ * @var string                           $bulk_edit_url
  */
 
 if ( ! defined( 'ABSPATH' ) ) {
@@ -35,3 +36,6 @@ if ( ! defined( 'ABSPATH' ) ) {
 		<?php endforeach; ?>
 	</tbody>
 </table>
+<p class="description">
+	<a href="<?php echo esc_url( $bulk_edit_url ); ?>"><?php esc_html_e( 'Bulk edit all products →', 'mh-dev-kit' ); ?></a>
+</p>

@@ -8,6 +8,7 @@ declare(strict_types=1);
 namespace MH\DevKit\Tests\Unit\ContentTools;
 
 use MH\DevKit\Modules\ContentTools\Features\LocalAdPage\Models\LocalAdPageModel;
+use MH\DevKit\Modules\ContentTools\Features\LocalAdPage\Models\LocalAdPageSettingsModel;
 use MH\DevKit\Tests\TestCase;
 
 final class LocalAdPageModelTest extends TestCase {
@@ -16,22 +17,38 @@ final class LocalAdPageModelTest extends TestCase {
 
 	protected function setUp(): void {
 		parent::setUp();
-		$this->model = new LocalAdPageModel();
+		$this->model = new LocalAdPageModel( new LocalAdPageSettingsModel() );
+	}
+
+	public function test_build_path_dash_pattern_by_default(): void {
+		$location = array(
+			'country'  => 'au',
+			'state'    => 'vic',
+			'suburb'   => 'shepparton',
+			'postcode' => '3630',
+		);
+
+		$this->assertSame(
+			'local-au-vic-shepparton-3630',
+			$this->model->build_path( $location )
+		);
+	}
+
+	public function test_build_path_slash_pattern(): void {
+		$location = array(
+			'country'  => 'au',
+			'state'    => 'vic',
+			'suburb'   => 'shepparton',
+			'postcode' => '3630',
+		);
+
+		$this->assertSame(
+			'local/au/vic/shepparton-3630',
+			$this->model->build_path( $location, LocalAdPageSettingsModel::URL_PATTERN_SLASH )
+		);
 	}
 
 	public function test_build_path_requires_all_segments(): void {
-		$this->assertSame(
-			'local/au/vic/shepparton-3630',
-			$this->model->build_path(
-				array(
-					'country'  => 'au',
-					'state'    => 'vic',
-					'suburb'   => 'shepparton',
-					'postcode' => '3630',
-				)
-			)
-		);
-
 		$this->assertSame( '', $this->model->build_path( array( 'country' => 'au' ) ) );
 	}
 
@@ -57,7 +74,7 @@ final class LocalAdPageModelTest extends TestCase {
 		update_post_meta( $post_id, LocalAdPageModel::META_POSTCODE, '3630' );
 
 		$this->assertSame(
-			home_url( 'local/au/vic/shepparton-3630/' ),
+			home_url( 'local-au-vic-shepparton-3630/' ),
 			$this->model->get_public_url( $post_id )
 		);
 	}
@@ -82,6 +99,7 @@ final class LocalAdPageModelTest extends TestCase {
 
 		$this->assertSame( $post_id, $item['id'] );
 		$this->assertArrayHasKey( 'url', $item );
+		$this->assertArrayHasKey( 'url_pattern', $item );
 		$this->assertArrayHasKey( 'location', $item );
 	}
 }

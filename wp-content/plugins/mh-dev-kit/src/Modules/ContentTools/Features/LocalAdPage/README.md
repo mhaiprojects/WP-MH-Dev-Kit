@@ -4,15 +4,18 @@ Suburb-specific landing pages with auto-generated URLs and REST API for AI agent
 
 ## Public URL pattern
 
-```
-/local/{country}/{state}/{suburb}-{postcode}/
-```
+Configurable under **MHDK Settings → Content Tools → — Local Ad Pages**.
 
-Example (seed): `/local/au/vic/shepparton-3630/`
+| Pattern | Example |
+|---------|---------|
+| **Dash-separated (default)** | `/local-au-vic-shepparton-3630/` |
+| **Slash-separated** | `/local/au/vic/shepparton-3630/` |
+
+Example (seed): `/local-au-vic-shepparton-3630/`
 
 ## Admin
 
-**MHDK Settings → Content Tools → Local Ad Pages**
+**MHDK Settings → Content Tools** — module hub and feature links.
 
 Set country, state, suburb, postcode, headline, and body. Featured image via post thumbnail.
 

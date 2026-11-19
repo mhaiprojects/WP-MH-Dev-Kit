@@ -12,6 +12,7 @@ namespace MH\DevKit\Modules\ContentTools\Features\MarkdownEditor;
 use MH\DevKit\Core\FeatureInterface;
 use MH\DevKit\Modules\ContentTools\Features\MarkdownEditor\Models\MarkdownModel;
 use MH\DevKit\Modules\ContentTools\Features\MarkdownEditor\Presenters\MarkdownBlockPresenter;
+use MH\DevKit\Modules\ContentTools\Features\MarkdownEditor\Presenters\MarkdownSeedPresenter;
 
 final class MarkdownEditorFeature implements FeatureInterface {
 
@@ -27,5 +28,6 @@ final class MarkdownEditorFeature implements FeatureInterface {
 		$model = new MarkdownModel();
 
 		( new MarkdownBlockPresenter( $model ) )->register();
+		( new MarkdownSeedPresenter( $model ) )->register();
 	}
 }

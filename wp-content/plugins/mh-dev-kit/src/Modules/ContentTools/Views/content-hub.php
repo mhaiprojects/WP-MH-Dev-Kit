@@ -36,6 +36,13 @@ use MH\DevKit\Modules\ContentTools\Features\LocalAdPage\Models\LocalAdPageModel;
 					<a href="<?php echo esc_url( admin_url( 'edit.php?post_type=' . LocalAdPageModel::POST_TYPE ) ); ?>">
 						<?php esc_html_e( 'Local Ad Pages', 'mh-dev-kit' ); ?>
 					</a>
+					<div class="row-actions">
+						<span class="settings">
+							<a href="<?php echo esc_url( admin_url( 'admin.php?page=mhdk-settings-local-ad' ) ); ?>">
+								<?php esc_html_e( 'URL pattern settings', 'mh-dev-kit' ); ?>
+							</a>
+						</span>
+					</div>
 				</td>
 				<td><?php esc_html_e( 'Auto-generated URLs from country/state/suburb/postcode. REST API at /wp-json/mhdk/v1/local-ads', 'mh-dev-kit' ); ?></td>
 			</tr>

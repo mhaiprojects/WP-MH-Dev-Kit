@@ -19,17 +19,27 @@
 	}
 
 	var blockName = 'mh-dev-kit/markdown';
-	var settings = wp.blocks.getBlockType( blockName );
 
-	if ( ! settings ) {
-		return;
-	}
-
-	wp.blocks.unregisterBlockType( blockName );
-
-	wp.blocks.registerBlockType(
-		blockName,
-		Object.assign( {}, settings, {
+	function registerMarkdownBlock() {
+		var existing = wp.blocks.getBlockType( blockName );
+		var settings = {
+			apiVersion: 3,
+			title: existing && existing.title ? existing.title : 'MH Markdown',
+			description:
+				existing && existing.description
+					? existing.description
+					: 'Write content in Markdown and render on the frontend.',
+			category: existing && existing.category ? existing.category : 'mhdk',
+			icon: existing && existing.icon ? existing.icon : 'editor-code',
+			attributes: existing && existing.attributes
+				? existing.attributes
+				: {
+						content: {
+							type: 'string',
+							default: '',
+						},
+				  },
+			supports: existing && existing.supports ? existing.supports : { html: false },
 			edit: function ( props ) {
 				var blockProps = useBlockProps( {
 					className: 'mhdk-markdown-editor',
@@ -73,6 +83,21 @@
 					)
 				);
 			},
-		} )
-	);
+			save: function () {
+				return null;
+			},
+		};
+
+		if ( existing ) {
+			wp.blocks.unregisterBlockType( blockName );
+		}
+
+		wp.blocks.registerBlockType( blockName, settings );
+	}
+
+	if ( wp.domReady ) {
+		wp.domReady( registerMarkdownBlock );
+	} else {
+		registerMarkdownBlock();
+	}
 } )( window.wp );

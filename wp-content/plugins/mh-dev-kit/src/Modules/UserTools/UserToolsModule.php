@@ -56,9 +56,8 @@ final class UserToolsModule implements ModuleInterface, ModuleAdminContributorIn
 	}
 
 	public function register_admin( AdminMenuRegistrar $registrar ): void {
-		$registrar->add_submenu(
-			self::CONTENT_SLUG,
-			__( 'User Tools', AdminMenu::TEXT_DOMAIN ),
+		$registrar->add_module_menu(
+			self::id(),
 			__( 'User Tools', AdminMenu::TEXT_DOMAIN ),
 			array( $this, 'render_content_hub' ),
 			'read'

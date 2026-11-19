@@ -46,9 +46,32 @@ final class AdminMenuRegistrar {
 	}
 
 	/**
+	 * Level-2 module submenu (hub / overview page).
+	 *
 	 * @param callable(): void $render_page Page callback.
 	 */
-	public function add_submenu(
+	public function add_module_menu(
+		string $module_id,
+		string $menu_title,
+		callable $render_page,
+		string $capability = 'manage_options'
+	): void {
+		add_submenu_page(
+			AdminMenu::SETTINGS_SLUG,
+			$menu_title,
+			$menu_title,
+			$capability,
+			AdminMenu::module_slug( $module_id ),
+			$render_page
+		);
+	}
+
+	/**
+	 * Level-3 feature page under a module (visual indent via em dash).
+	 *
+	 * @param callable(): void $render_page Page callback.
+	 */
+	public function add_module_submenu(
 		string $slug,
 		string $menu_title,
 		string $page_title,
@@ -58,14 +81,28 @@ final class AdminMenuRegistrar {
 		add_submenu_page(
 			AdminMenu::SETTINGS_SLUG,
 			$page_title,
-			$menu_title,
+			'— ' . $menu_title,
 			$capability,
 			$slug,
 			$render_page
 		);
 	}
 
-	/** @deprecated Use add_submenu() */
+	/**
+	 * @param callable(): void $render_page Page callback.
+	 * @deprecated Use add_module_submenu() for module-owned pages.
+	 */
+	public function add_submenu(
+		string $slug,
+		string $menu_title,
+		string $page_title,
+		callable $render_page,
+		string $capability = 'manage_options'
+	): void {
+		$this->add_module_submenu( $slug, $menu_title, $page_title, $render_page, $capability );
+	}
+
+	/** @deprecated Use add_module_submenu() */
 	public function add_settings_submenu(
 		string $slug,
 		string $menu_title,
@@ -73,7 +110,7 @@ final class AdminMenuRegistrar {
 		callable $render_page,
 		string $capability = 'manage_options'
 	): void {
-		$this->add_submenu( $slug, $menu_title, $page_title, $render_page, $capability );
+		$this->add_module_submenu( $slug, $menu_title, $page_title, $render_page, $capability );
 	}
 
 	public static function render_settings_dashboard(): void {

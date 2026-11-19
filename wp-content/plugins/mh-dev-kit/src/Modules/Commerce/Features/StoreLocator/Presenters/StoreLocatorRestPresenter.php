@@ -9,6 +9,7 @@ declare(strict_types=1);
 
 namespace MH\DevKit\Modules\Commerce\Features\StoreLocator\Presenters;
 
+use MH\DevKit\Modules\Commerce\Features\InventoryManagement\Models\InventoryModel;
 use MH\DevKit\Modules\Commerce\Features\StoreLocator\Models\StoreLocatorModel;
 use MH\DevKit\Modules\Commerce\Features\StoreLocator\Models\StoreLocatorSettingsModel;
 
@@ -16,7 +17,8 @@ final class StoreLocatorRestPresenter {
 
 	public function __construct(
 		private StoreLocatorModel $stores,
-		private StoreLocatorSettingsModel $settings
+		private StoreLocatorSettingsModel $settings,
+		private ?InventoryModel $inventory = null
 	) {}
 
 	public function register(): void {
@@ -51,6 +53,11 @@ final class StoreLocatorRestPresenter {
 						'required'          => true,
 						'type'              => 'number',
 						'sanitize_callback' => static fn( $value ): float => (float) $value,
+					),
+					'product_id' => array(
+						'required'          => false,
+						'type'              => 'integer',
+						'sanitize_callback' => static fn( $value ): int => (int) $value,
 					),
 				),
 			)
@@ -89,23 +96,27 @@ final class StoreLocatorRestPresenter {
 	}
 
 	public function stores_nearby( \WP_REST_Request $request ): \WP_REST_Response {
-		$lat = (float) $request->get_param( 'lat' );
-		$lng = (float) $request->get_param( 'lng' );
+		$lat        = (float) $request->get_param( 'lat' );
+		$lng        = (float) $request->get_param( 'lng' );
+		$product_id = (int) $request->get_param( 'product_id' );
 
 		$max_metres = $this->settings->get_max_distance_metres();
 		$sorted     = $this->stores->sort_by_distance( $lat, $lng );
 
-		$filtered = array_values(
-			array_filter(
-				$sorted,
-				static fn( array $store ): bool => (float) $store['distance_metres'] <= $max_metres
-			)
-		);
+		$payload = array();
 
-		$payload = array_map(
-			fn( array $store ): array => $this->public_store( $store, true ),
-			$filtered
-		);
+		foreach ( $sorted as $store ) {
+			$row = $this->public_store( $store, true );
+			$row['within_radius'] = (float) $store['distance_metres'] <= $max_metres;
+
+			if ( $product_id > 0 && null !== $this->inventory ) {
+				$stock                   = $this->inventory->get_stock( $product_id, (string) $store['id'] );
+				$row['stock_quantity']   = $stock;
+				$row['has_stock']        = $stock > 0;
+			}
+
+			$payload[] = $row;
+		}
 
 		return new \WP_REST_Response( $payload, 200 );
 	}

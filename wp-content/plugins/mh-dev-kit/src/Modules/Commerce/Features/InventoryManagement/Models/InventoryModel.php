@@ -146,6 +146,68 @@ final class InventoryModel {
 		$this->save_levels_for_product( (int) $product->get_id(), $levels );
 	}
 
+	/**
+	 * @return array{available: bool, minimum: int}
+	 */
+	public function get_minimum_cart_stock_at_store( \WC_Cart $cart, string $store_id ): array {
+		$minimum = PHP_INT_MAX;
+
+		foreach ( $cart->get_cart() as $item ) {
+			$product_id = (int) ( $item['product_id'] ?? 0 );
+			$quantity   = (int) ( $item['quantity'] ?? 0 );
+
+			if ( $product_id <= 0 || $quantity <= 0 ) {
+				continue;
+			}
+
+			$stock = $this->get_stock( $product_id, $store_id );
+			$minimum = min( $minimum, $stock );
+		}
+
+		if ( PHP_INT_MAX === $minimum ) {
+			return array(
+				'available' => true,
+				'minimum'   => 0,
+			);
+		}
+
+		return array(
+			'available' => $minimum > 0,
+			'minimum'   => max( 0, $minimum ),
+		);
+	}
+
+	/**
+	 * @return array<int, array{name: string, available: int, requested: int}>
+	 */
+	public function get_cart_stock_issues( \WC_Cart $cart, string $store_id ): array {
+		$issues = array();
+
+		foreach ( $cart->get_cart() as $item ) {
+			$product_id = (int) ( $item['product_id'] ?? 0 );
+			$quantity   = (int) ( $item['quantity'] ?? 0 );
+
+			if ( $product_id <= 0 || $quantity <= 0 ) {
+				continue;
+			}
+
+			$available = $this->get_stock( $product_id, $store_id );
+
+			if ( $available < $quantity ) {
+				$product = wc_get_product( $product_id );
+				$name    = $product ? $product->get_name() : '#' . $product_id;
+
+				$issues[] = array(
+					'name'      => $name,
+					'available' => $available,
+					'requested' => $quantity,
+				);
+			}
+		}
+
+		return $issues;
+	}
+
 	private function product_key( int $product_id ): string {
 		return 'product_' . max( 0, $product_id );
 	}

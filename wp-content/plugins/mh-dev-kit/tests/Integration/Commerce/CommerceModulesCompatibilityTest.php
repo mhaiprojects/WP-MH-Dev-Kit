@@ -76,6 +76,20 @@ final class CommerceModulesCompatibilityTest extends TestCase {
 		$stock_data    = rest_get_server()->dispatch( $stock_request )->get_data();
 
 		$this->assertNotEmpty( $stock_data );
-		$this->assertSame( $nearby[0]['id'], $stock_data[0]['id'] );
+		$this->assertSame( 'melbourne-cbd', $nearby[0]['id'] );
+
+		$stock_ids = array_column( $stock_data, 'id' );
+		$this->assertContains( 'melbourne-cbd', $stock_ids );
+
+		$melbourne_stock = null;
+		foreach ( $stock_data as $row ) {
+			if ( 'melbourne-cbd' === $row['id'] ) {
+				$melbourne_stock = $row;
+				break;
+			}
+		}
+
+		$this->assertNotNull( $melbourne_stock );
+		$this->assertSame( 5, $melbourne_stock['stock_quantity'] );
 	}
 }

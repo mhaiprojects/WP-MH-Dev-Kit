@@ -13,6 +13,7 @@ use MH\DevKit\Core\ViewRenderer;
 use MH\DevKit\Modules\Commerce\Features\InventoryManagement\Models\InventoryModel;
 use MH\DevKit\Modules\Commerce\Features\InventoryManagement\Models\InventorySettingsModel;
 use MH\DevKit\Modules\Commerce\Features\StoreLocator\Models\StoreLocatorModel;
+use MH\DevKit\Shared\AssetRegistrar;
 
 final class InventoryProductPresenter {
 
@@ -25,6 +26,7 @@ final class InventoryProductPresenter {
 		add_action( 'add_meta_boxes', array( $this, 'register_meta_box' ) );
 		add_action( 'save_post_product', array( $this, 'save_meta_box' ), 10, 2 );
 		add_action( 'woocommerce_single_product_summary', array( $this, 'render_frontend_availability' ), 25 );
+		add_action( 'wp_enqueue_scripts', array( $this, 'enqueue_frontend_assets' ) );
 	}
 
 	public function register_meta_box(): void {
@@ -44,9 +46,10 @@ final class InventoryProductPresenter {
 		ViewRenderer::display(
 			'Modules/Commerce/Features/InventoryManagement/Views/product-meta-box.php',
 			array(
-				'stores'   => ( new StoreLocatorModel() )->get_active(),
-				'levels'   => $this->inventory->get_levels_for_product( (int) $post->ID ),
-				'product_id' => (int) $post->ID,
+				'stores'       => ( new StoreLocatorModel() )->get_active(),
+				'levels'       => $this->inventory->get_levels_for_product( (int) $post->ID ),
+				'product_id'   => (int) $post->ID,
+				'bulk_edit_url'=> admin_url( 'admin.php?page=' . InventorySettingsModel::SETTINGS_SLUG . '&product_id=' . (int) $post->ID ),
 			)
 		);
 	}
@@ -76,6 +79,18 @@ final class InventoryProductPresenter {
 		$this->inventory->save_levels_for_product( $post_id, $levels );
 	}
 
+	public function enqueue_frontend_assets(): void {
+		if ( ! function_exists( 'is_product' ) || ! is_product() || ! $this->settings->show_on_product() ) {
+			return;
+		}
+
+		AssetRegistrar::enqueue_style(
+			'mhdk-store-locator',
+			'Modules/Commerce/Features/StoreLocator',
+			'css/store-locator.css'
+		);
+	}
+
 	public function render_frontend_availability(): void {
 		if ( ! $this->settings->show_on_product() || ! function_exists( 'is_product' ) || ! is_product() ) {
 			return;
@@ -87,17 +102,17 @@ final class InventoryProductPresenter {
 			return;
 		}
 
-		$stores = $this->inventory->get_stores_with_stock( (int) $product->get_id() );
-
-		if ( array() === $stores ) {
-			return;
-		}
+		$product_id    = (int) $product->get_id();
+		$stores        = $this->inventory->get_stores_with_stock( $product_id );
+		$has_any_stock = ! empty( $stores );
 
 		ViewRenderer::display(
 			'Modules/Commerce/Features/InventoryManagement/Views/product-availability.php',
 			array(
-				'stores'     => $stores,
-				'threshold'  => $this->settings->low_stock_threshold(),
+				'stores'        => $has_any_stock ? $stores : array(),
+				'threshold'     => $this->settings->low_stock_threshold(),
+				'product_id'    => $product_id,
+				'has_any_stock' => $has_any_stock,
 			)
 		);
 	}

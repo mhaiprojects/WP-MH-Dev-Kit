@@ -22,4 +22,8 @@ final class AdminMenu {
 	public const BLOCK_CATEGORY = 'mhdk';
 
 	public const TEXT_DOMAIN = 'mh-dev-kit';
+
+	public static function module_slug( string $module_id ): string {
+		return 'mhdk-module-' . sanitize_key( $module_id );
+	}
 }

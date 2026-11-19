@@ -167,6 +167,24 @@ final class StoreLocatorModel {
 		update_option( self::OPTION_KEY, $this->get_defaults(), false );
 	}
 
+	public function reset_to_defaults(): void {
+		update_option( self::OPTION_KEY, $this->get_defaults(), false );
+	}
+
+	/**
+	 * @param array<int, array<string, mixed>> $stores Store rows.
+	 */
+	public function save_stores( array $stores ): void {
+		update_option( self::OPTION_KEY, $this->normalize_stores( $stores ), false );
+	}
+
+	public function maps_url( array $store ): string {
+		$lat = (float) ( $store['lat'] ?? 0 );
+		$lng = (float) ( $store['lng'] ?? 0 );
+
+		return 'https://maps.google.com/?q=' . rawurlencode( $lat . ',' . $lng );
+	}
+
 	/**
 	 * @param array<int, array<string, mixed>> $stores Raw store rows.
 	 * @return array<int, array<string, mixed>>

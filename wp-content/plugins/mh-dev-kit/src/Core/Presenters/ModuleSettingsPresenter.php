@@ -10,10 +10,10 @@ declare(strict_types=1);
 namespace MH\DevKit\Core\Presenters;
 
 use MH\DevKit\Core\Admin\AdminMenu;
-use MH\DevKit\Core\Admin\AdminMenuRegistrar;
 use MH\DevKit\Core\Admin\ModulesListTable;
 use MH\DevKit\Core\Models\ModuleSettingsModel;
 use MH\DevKit\Core\ModuleLoader;
+use MH\DevKit\Core\ModuleRequirements;
 use MH\DevKit\Core\ViewRenderer;
 
 final class ModuleSettingsPresenter {
@@ -53,24 +53,50 @@ final class ModuleSettingsPresenter {
 	}
 
 	public function render_page(): void {
-		$model   = new ModuleSettingsModel();
-		$classes = ModuleLoader::module_classes();
-		$modules = array();
+		$model    = new ModuleSettingsModel();
+		$classes  = ModuleLoader::module_classes();
+		$settings = $model->get_all( $classes );
+		$names    = ModuleRequirements::module_name_map( $classes );
+		$modules  = array();
 
 		foreach ( $classes as $class ) {
 			$instance = new $class();
 			$req      = $instance->requirements();
+			$id       = $class::id();
+
+			$required_modules = array();
+
+			foreach ( $req->required_modules() as $dep_id ) {
+				$required_modules[] = array(
+					'id'      => $dep_id,
+					'name'    => $names[ $dep_id ] ?? $dep_id,
+					'enabled' => ! empty( $settings[ $dep_id ]['enabled'] ),
+				);
+			}
+
+			$dependents = array();
+
+			foreach ( $model->get_dependents( $id, $classes ) as $dependent_class ) {
+				$dependents[] = $dependent_class::name();
+			}
+
+			$plugin_messages = $req->unmet_messages();
+			$module_messages = $req->unmet_module_messages( $model, $classes );
 
 			$modules[] = array(
-				'id'          => $class::id(),
-				'name'        => $class::name(),
-				'description' => $class::description(),
-				'requirements_met' => $req->met(),
-				'requirements_messages' => $req->unmet_messages(),
+				'id'                      => $id,
+				'name'                    => $class::name(),
+				'description'             => $class::description(),
+				'requirements_met'        => $req->met() && $req->module_dependencies_met( $model, $classes ),
+				'requirements_messages'   => array_merge( $plugin_messages, $module_messages ),
+				'module_dependencies_met' => $req->module_dependencies_met( $model, $classes ),
+				'required_modules'        => $required_modules,
+				'required_plugins'        => $req->required_plugins(),
+				'dependents'              => $dependents,
 			);
 		}
 
-		$table = new ModulesListTable( $modules, $model->get_all( $classes ), ModuleSettingsModel::OPTION_KEY );
+		$table = new ModulesListTable( $modules, $settings, ModuleSettingsModel::OPTION_KEY );
 		$table->prepare_items();
 
 		ViewRenderer::display(

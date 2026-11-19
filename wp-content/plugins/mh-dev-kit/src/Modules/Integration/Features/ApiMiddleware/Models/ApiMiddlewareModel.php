@@ -17,6 +17,8 @@ final class ApiMiddlewareModel {
 
 	public const CRON_HOOK = 'mhdk_api_middleware_run_scheduled';
 
+	public const LAST_RUN_TRANSIENT = 'mhdk_api_last_run_notice';
+
 	/**
 	 * @return array<int, array<string, mixed>>
 	 */
@@ -49,8 +51,12 @@ final class ApiMiddlewareModel {
 
 		foreach ( $connections as $index => $existing ) {
 			if ( $existing['id'] === $normalized['id'] ) {
+				if ( '' === $normalized['auth_value'] ) {
+					$normalized['auth_value'] = (string) $existing['auth_value'];
+				}
+
 				$connections[ $index ] = $normalized;
-				$found                 = true;
+				$found                   = true;
 				break;
 			}
 		}
@@ -86,6 +92,82 @@ final class ApiMiddlewareModel {
 			);
 		}
 
+		return $this->execute_request( $connection, true );
+	}
+
+	/**
+	 * Test a connection without persisting results.
+	 *
+	 * @param array<string, mixed> $connection Connection payload.
+	 * @return array<string, mixed>
+	 */
+	public function test_connection( array $connection ): array {
+		$existing = null;
+
+		if ( ! empty( $connection['id'] ) ) {
+			$existing = $this->get_connection( (string) $connection['id'] );
+		}
+
+		$normalized = $this->normalize_connection( $connection );
+
+		if ( null !== $existing && '' === $normalized['auth_value'] ) {
+			$normalized['auth_value'] = (string) $existing['auth_value'];
+		}
+
+		if ( '' === $normalized['base_url'] ) {
+			return array(
+				'success' => false,
+				'message' => 'Base URL is required.',
+				'status'  => 0,
+			);
+		}
+
+		return $this->execute_request( $normalized, false );
+	}
+
+	/**
+	 * @return array<string, mixed>|null
+	 */
+	public function get_stored_preview( array $connection, int $max_chars = 500 ): ?array {
+		$key = (string) ( $connection['target_key'] ?? '' );
+
+		if ( '' === $key ) {
+			return null;
+		}
+
+		$body = 'transient' === ( $connection['target_type'] ?? 'option' )
+			? get_transient( $key )
+			: get_option( $key, '' );
+
+		if ( ! is_string( $body ) || '' === $body ) {
+			return null;
+		}
+
+		$truncated = strlen( $body ) > $max_chars
+			? substr( $body, 0, $max_chars ) . '…'
+			: $body;
+
+		return array(
+			'key'     => $key,
+			'preview' => $truncated,
+		);
+	}
+
+	public function get_last_run_notice(): ?array {
+		$stored = get_transient( self::LAST_RUN_TRANSIENT );
+
+		return is_array( $stored ) ? $stored : null;
+	}
+
+	public function set_last_run_notice( array $notice ): void {
+		set_transient( self::LAST_RUN_TRANSIENT, $notice, MINUTE_IN_SECONDS );
+	}
+
+	/**
+	 * @param array<string, mixed> $connection Connection row.
+	 * @return array<string, mixed>
+	 */
+	private function execute_request( array $connection, bool $persist ): array {
 		$url     = $this->build_url( $connection );
 		$headers = $this->build_headers( $connection );
 		$method  = strtoupper( (string) $connection['method'] );
@@ -106,7 +188,11 @@ final class ApiMiddlewareModel {
 				'message' => $response->get_error_message(),
 				'status'  => 0,
 			);
-			$this->persist_result( $connection, $result, '' );
+
+			if ( $persist ) {
+				$this->persist_result( $connection, $result, '' );
+			}
+
 			return $result;
 		}
 
@@ -115,12 +201,16 @@ final class ApiMiddlewareModel {
 		$ok     = $status >= 200 && $status < 300;
 
 		$result = array(
-			'success' => $ok,
-			'message' => $ok ? 'OK' : 'HTTP ' . $status,
-			'status'  => $status,
+			'success'       => $ok,
+			'message'       => $ok ? 'OK' : 'HTTP ' . $status,
+			'status'        => $status,
+			'body_preview'  => strlen( $body ) > 500 ? substr( $body, 0, 500 ) . '…' : $body,
+			'target_key'    => (string) ( $connection['target_key'] ?? '' ),
 		);
 
-		$this->persist_result( $connection, $result, $body );
+		if ( $persist ) {
+			$this->persist_result( $connection, $result, $body );
+		}
 
 		return $result;
 	}

@@ -27,6 +27,10 @@ final class LocalAdPageModel {
 
 	public const SEED_OPTION = 'mhdk_local_ad_shepparton_seeded';
 
+	public function __construct(
+		private LocalAdPageSettingsModel $settings = new LocalAdPageSettingsModel()
+	) {}
+
 	/**
 	 * @return array<string, mixed>
 	 */
@@ -60,7 +64,11 @@ final class LocalAdPageModel {
 		);
 	}
 
-	public function build_path( array $location ): string {
+	/**
+	 * @param array<string, mixed> $location Location fields.
+	 * @param string|null            $pattern  URL pattern override.
+	 */
+	public function build_path( array $location, ?string $pattern = null ): string {
 		$country  = sanitize_title( (string) ( $location['country'] ?? '' ) );
 		$state    = sanitize_title( (string) ( $location['state'] ?? '' ) );
 		$suburb   = sanitize_title( (string) ( $location['suburb'] ?? '' ) );
@@ -70,8 +78,20 @@ final class LocalAdPageModel {
 			return '';
 		}
 
+		$pattern = $pattern ?? $this->settings->url_pattern();
+
+		if ( LocalAdPageSettingsModel::URL_PATTERN_SLASH === $pattern ) {
+			return sprintf(
+				'local/%s/%s/%s-%s',
+				$country,
+				$state,
+				$suburb,
+				$postcode
+			);
+		}
+
 		return sprintf(
-			'local/%s/%s/%s-%s',
+			'local-%s-%s-%s-%s',
 			$country,
 			$state,
 			$suburb,
@@ -146,6 +166,7 @@ final class LocalAdPageModel {
 			'body'      => (string) get_post_meta( $post->ID, self::META_BODY, true ),
 			'location'  => $location,
 			'url'       => $this->get_public_url( (int) $post->ID ),
+			'url_pattern' => $this->settings->url_pattern(),
 			'status'    => $post->post_status,
 			'modified'  => $post->post_modified_gmt,
 		);

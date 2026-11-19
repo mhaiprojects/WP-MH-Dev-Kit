@@ -61,7 +61,13 @@ final class CoreModule implements ModuleInterface, ModuleAdminContributorInterfa
 	public function register_admin( AdminMenuRegistrar $registrar ): void {
 		$poc_settings = $this->poc_settings;
 
-		$registrar->add_submenu(
+		$registrar->add_module_menu(
+			self::id(),
+			__( 'Core', AdminMenu::TEXT_DOMAIN ),
+			array( $this, 'render_module_hub' )
+		);
+
+		$registrar->add_module_submenu(
 			MhdkPocSettingsModel::SETTINGS_SLUG,
 			__( 'MHDK-POC', AdminMenu::TEXT_DOMAIN ),
 			__( 'MHDK-POC Settings', AdminMenu::TEXT_DOMAIN ),
@@ -70,12 +76,21 @@ final class CoreModule implements ModuleInterface, ModuleAdminContributorInterfa
 			}
 		);
 
-		$registrar->add_submenu(
+		$registrar->add_module_submenu(
 			AdminMenu::CORE_CONTENT_SLUG,
 			__( 'Content', AdminMenu::TEXT_DOMAIN ),
 			__( 'MHDK Content', AdminMenu::TEXT_DOMAIN ),
 			array( $this, 'render_content_hub' ),
 			'edit_posts'
+		);
+	}
+
+	public function render_module_hub(): void {
+		ViewRenderer::display(
+			'Modules/Core/Views/module-hub.php',
+			array(
+				'version' => MH_DEV_KIT_VERSION,
+			)
 		);
 	}
 

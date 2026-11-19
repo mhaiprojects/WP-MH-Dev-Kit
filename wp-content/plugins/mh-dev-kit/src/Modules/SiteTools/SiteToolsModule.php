@@ -14,6 +14,7 @@ use MH\DevKit\Core\Admin\AdminMenuRegistrar;
 use MH\DevKit\Core\Admin\ModuleAdminContributorInterface;
 use MH\DevKit\Core\ModuleInterface;
 use MH\DevKit\Core\ModuleRequirements;
+use MH\DevKit\Core\ViewRenderer;
 use MH\DevKit\Modules\SiteTools\Features\BackendRestrictOrigin\BackendRestrictOriginFeature;
 use MH\DevKit\Modules\SiteTools\Features\BackendRestrictOrigin\Models\RestrictOriginSettingsModel;
 use MH\DevKit\Modules\SiteTools\Features\BackendRestrictOrigin\Presenters\RestrictOriginSettingsPresenter;
@@ -66,7 +67,13 @@ final class SiteToolsModule implements ModuleInterface, ModuleAdminContributorIn
 		$restrict_origin_settings = $this->restrict_origin_settings;
 		$map_distance_settings    = $this->map_distance_settings;
 
-		$registrar->add_submenu(
+		$registrar->add_module_menu(
+			self::id(),
+			__( 'Site Tools', AdminMenu::TEXT_DOMAIN ),
+			array( $this, 'render_module_hub' )
+		);
+
+		$registrar->add_module_submenu(
 			RestrictOriginSettingsModel::SETTINGS_SLUG,
 			__( 'Restrict Origin', AdminMenu::TEXT_DOMAIN ),
 			__( 'Backend Restrict Origin', AdminMenu::TEXT_DOMAIN ),
@@ -75,13 +82,22 @@ final class SiteToolsModule implements ModuleInterface, ModuleAdminContributorIn
 			}
 		);
 
-		$registrar->add_submenu(
+		$registrar->add_module_submenu(
 			MapDistanceSettingsModel::SETTINGS_SLUG,
 			__( 'Map Distance', AdminMenu::TEXT_DOMAIN ),
 			__( 'Map Distance Settings', AdminMenu::TEXT_DOMAIN ),
 			static function () use ( $map_distance_settings ): void {
 				$map_distance_settings->render_settings();
 			}
+		);
+	}
+
+	public function render_module_hub(): void {
+		ViewRenderer::display(
+			'Modules/SiteTools/Views/module-hub.php',
+			array(
+				'version' => MH_DEV_KIT_VERSION,
+			)
 		);
 	}
 }

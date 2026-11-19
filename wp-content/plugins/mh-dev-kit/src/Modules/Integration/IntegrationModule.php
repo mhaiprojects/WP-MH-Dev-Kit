@@ -76,10 +76,13 @@ final class IntegrationModule implements ModuleInterface, ModuleAdminContributor
 	}
 
 	public function render_module_hub(): void {
+		$model = new ApiMiddlewareModel();
+
 		ViewRenderer::display(
 			'Modules/Integration/Views/module-hub.php',
 			array(
-				'version' => MH_DEV_KIT_VERSION,
+				'version'          => MH_DEV_KIT_VERSION,
+				'connection_count' => count( $model->get_connections() ),
 			)
 		);
 	}

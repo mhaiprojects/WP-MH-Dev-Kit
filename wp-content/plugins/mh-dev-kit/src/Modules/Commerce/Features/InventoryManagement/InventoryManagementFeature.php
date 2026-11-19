@@ -12,7 +12,6 @@ namespace MH\DevKit\Modules\Commerce\Features\InventoryManagement;
 use MH\DevKit\Core\FeatureInterface;
 use MH\DevKit\Modules\Commerce\Features\InventoryManagement\Models\InventoryModel;
 use MH\DevKit\Modules\Commerce\Features\InventoryManagement\Models\InventorySettingsModel;
-use MH\DevKit\Modules\Commerce\Features\InventoryManagement\Presenters\InventoryAdminPresenter;
 use MH\DevKit\Modules\Commerce\Features\InventoryManagement\Presenters\InventoryProductPresenter;
 use MH\DevKit\Modules\Commerce\Features\InventoryManagement\Presenters\InventoryRestPresenter;
 use MH\DevKit\Modules\Commerce\Features\InventoryManagement\Presenters\InventorySeedPresenter;
@@ -32,7 +31,6 @@ final class InventoryManagementFeature implements FeatureInterface {
 		$settings  = new InventorySettingsModel();
 
 		( new InventorySeedPresenter( $inventory ) )->register();
-		( new InventoryAdminPresenter( $inventory, $settings ) )->register();
 		( new InventoryProductPresenter( $inventory, $settings ) )->register();
 		( new InventoryRestPresenter( $inventory ) )->register();
 	}

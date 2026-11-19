@@ -27,6 +27,12 @@ final class LocalAdPageFrontendPresenter {
 
 	public function add_rewrite(): void {
 		add_rewrite_rule(
+			'^local-([^-]+)-([^-]+)-(.+)-([0-9]{3,10})/?$',
+			'index.php?mhdk_local_country=$matches[1]&mhdk_local_state=$matches[2]&mhdk_local_suburb=$matches[3]&mhdk_local_postcode=$matches[4]',
+			'top'
+		);
+
+		add_rewrite_rule(
 			'^local/([^/]+)/([^/]+)/([^/]+)-([^/]+)/?$',
 			'index.php?mhdk_local_country=$matches[1]&mhdk_local_state=$matches[2]&mhdk_local_suburb=$matches[3]&mhdk_local_postcode=$matches[4]',
 			'top'
